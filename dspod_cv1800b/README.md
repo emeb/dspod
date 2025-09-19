@@ -6,27 +6,31 @@ The dspod_cv1800b is a daughterboard comprising a Sophon/CVItek CV1800B Linux So
 with 64MB RAM, SD card interface, USB and GPIO + audio I/O.
 
 ## Abstract
+
 This board is a small 32-pin device with the following features:
+
 * CV1800B Linux SoC
- * 68-pin QFN package
- * 1GHz RISC-V primary CPU
- * 700MHz RISC-V secondary CPU
- * 8051 low-power CPU
- * 64MB SDRAM
- * 0.5 TOPS NPU
+  - 1GHz RISC-V primary CPU
+  - 700MHz RISC-V secondary CPU
+  - 8051 low-power CPU
+  - 64MB SDRAM
+  - 0.5 TOPS NPU
+  - 68-pin QFN package
 * Micro SD card slot
 * USB-C connector
 * Nuvoton NAU88C22 stereo codec
 * Misc GPIO
- * SPI
- * I2C
- * GPIO
+  - SPI
+  - I2C
+  - GPIO
 * Four channels of 3.3V multiplexed A/D input
 
 ## Design Materials
+
 * [Schematic](./doc/dspod_cv1800b_schematic.pdf)
 
 ## Software
+
 The CV1800B SoC runs a Buildroot / Busybox version of Linux based on a 5.10 kernel
 with vendor-customized extensions (not upstreamed). The vendor SDK is freely
 available here [Milk-V SDK V2](https://github.com/milkv-duo/duo-buildroot-sdk-v2)

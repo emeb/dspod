@@ -9,16 +9,16 @@ The dspod_rp2350 is a daughterboard comprising an RP2350A MCU with 4MB Flash, 8M
 This board is a small 32-pin device with the following features:
 
 * RP2350 MCU
-  * 68-pin QFN package
-  * Dual-core Arm Cortex M33 or Hazard3 RISC-V CPUs 
-  * 520kB SRAM
-  * USB, I2C, SPI, ADC, GPIO, PIO, etc on-chip
+  - 68-pin QFN package
+  - Dual-core Arm Cortex M33 or Hazard3 RISC-V CPUs 
+  - 520kB SRAM
+  - USB, I2C, SPI, ADC, GPIO, PIO, etc on-chip
 * USB-C connector, full-speed host/device
 * Nuvoton NAU88C22 stereo codec
 * Misc GPIO
-  * SPI
-  * I2C
-  * GPIO
+  - SPI
+  - I2C
+  - GPIO
 * Four channels of 3.3V multiplexed A/D input
 
 ## Design Materials
