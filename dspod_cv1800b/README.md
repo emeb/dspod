@@ -7,13 +7,15 @@ with 64MB RAM, SD card interface, USB and GPIO + audio I/O.
 
 ## Abstract
 
-This board is a small 32-pin device with the following features:
+This project was inspired by the release of the Milk-V Duo development board for the Sophgo/CVItek CV1800B SoC back in late 2023. The main chip is a 1GHz dual-core RISC-V system with integrated DRAM in a DIY-friendly 68-pin QFN package that would allow me to build a single-board audio DSP module at low cost without needing fancy PCB processes of complex assembly. I spent a fair amount of time exploring the hardware and OS before concluding that I would be able to tweak it to my requirements, but after getting the basic interfaces working on the Duo board it decided to roll my own.
+
+The board is a small 32-pin device with the following features:
 
 * CV1800B Linux SoC
   - 1GHz RISC-V primary CPU
   - 700MHz RISC-V secondary CPU
   - 8051 low-power CPU
-  - 64MB SDRAM
+  - 64MB SDRAM~~~~
   - 0.5 TOPS NPU
   - 68-pin QFN package
 * Micro SD card slot
