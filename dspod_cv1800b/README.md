@@ -53,8 +53,6 @@ Building an audio DSP module based on the CV1800B SoC was the primary motivation
 
 - LCD + encoder based UI
 
-
-
 Getting all this working under the Milk-V SDK V2 has been an interesting experience. A few of the things I learned:
 
 #### Audio I/O
@@ -112,7 +110,7 @@ All of these effects worked as expected with no noticeable glitching or disconti
 
 ###### Frequency Domain
 
-Frequency (or "Spectral") effects rely on the Fast-Fourier Transform (FFT) to convert audio samples into 'bins' of discrete frequency magnitude and phase. The FFT is a fairly math-intensive algorithm and for every buffer of audio it's necessary to perform a forward and reverse transform with the unique spectral algorithm sandwiched between the two. I have a collection of interesting algorithms based on a method called "phase vocoder" that were developed on the E520 Hyperion effects processor and run on the STM32H743 MCU (a 480MHz Arm Cortex M7 CPU) using the FFT algorithms provided by the Arm CMSIS DSP library. The CMSIS FFT will not run on the CV1800B SoC so I needed to find an alternative and after some research I settled on the 'pffft' open-source FFT library which has a reputation for reasonably good performance.
+Frequency (or "Spectral") effects rely on the Fast-Fourier Transform (FFT) to convert audio samples into 'bins' of discrete frequency magnitude and phase. The FFT is a fairly math-intensive algorithm and for every buffer of audio it's necessary to perform a forward and reverse transform with the unique spectral algorithm sandwiched between the two. I have a collection of interesting algorithms based on a method called "phase vocoder" that were developed on the [Synthesis Technology - Eurorack E520](https://synthtech.com/eurorack/E520/) and run on the [STM32H743](https://www.st.com/en/microcontrollers-microprocessors/stm32h743-753.html) MCU (a 480MHz Arm Cortex M7 CPU) using the FFT algorithms provided by the Arm CMSIS DSP library. The CMSIS FFT will not run on the CV1800B SoC so I needed to find an alternative and after some research I settled on the [pffft](https://bitbucket.org/jpommier/pffft/src/master/) open-source FFT library which has a reputation for reasonably good performance.
 
 I was able to bring the basic transform processing up on the CV1800B under Linux without difficulty and some benchmarking suggested the 4096-point transform I needed would run in about 1ms - well within the 10ms/buffer that I had available. Given two transforms, the phase vocoder and any unique processing required it seemed there would be enough CPU cycles to get some spectral effects going and the load calculations in my audio test harness showed that basic forward + reverse transforms were taking about 27% of the CPU. Unfortunately the combination of all the I/O, UI and DSP plus background processing for the whole system pushed the total load to over 50% which caused time-critical audio I/O processing to miss its schedule and quickly hang the processor.
 
@@ -124,7 +122,7 @@ The CV1800B SoC under Linux works fine for lightly loaded audio effects but stru
 
 There may be ways to mitigate this:
 
-- Study and possibly re-work the audio I/O handling thread to move the processing delay outside of the critical read->write cycle.
+- Study and possibly re-work the audio I/O handling thread to move the processing delay outside of the critical read->write cycle. [EDIT - I've tried this and it does help somewhat, but I/O errors still occur after a few minutes of runtime]
 
 - Optimize the FFT algorithm to take advantage of the RISC-V vector (RVV) extensions. RVV is available on the CV1800B SoC's two THead C906 cores and SIMD processing has been shown to provide approximately 30-40% increase in performane on other achitectures. Although the pffft library already supports SIMD optimization on x86, ARM and PPC, a quick analysis suggests that extensive effort would be required add RVV capability due to differences in the way it is implemented vs older architectures.
 
