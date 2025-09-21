@@ -28,6 +28,11 @@ This board is a small 32-pin device with the following features:
 ## Design Materials
 
 * [Schematic](./doc/dspod_cv1800b_schematic.pdf)
+* [Bill of Materials](./doc/dspod_cv1800b_BOM.ods) (in LibreOffice Calc spreadsheet format)
+
+## Hardware
+
+ Schematic and board design were done with Kicad 9.x and the project is available in the [Hardware](./Hardware/) directory.
 
 ## Software
 
@@ -106,7 +111,7 @@ I "ported" most of my library of interesting time-domain audio effects over to t
 
 - Reverbs - several different types, including an emulation of the venerable MIDIverb for algorithmic simulations of natural spaces.
 
-All of these effects worked as expected with no noticeable glitching or discontiuities in the audio caused by background processes in the Linux operating system and typical CPU loading seen during the worst-case reverb algorithms was about 15%. The problem arose when I tried...
+All of these effects worked as expected with no noticeable glitching or discontiuities in the audio caused by background processes in the Linux operating system and typical CPU loading seen during the worst-case reverb algorithms was about 15%.
 
 ###### Frequency Domain
 
@@ -114,15 +119,11 @@ Frequency (or "Spectral") effects rely on the Fast-Fourier Transform (FFT) to co
 
 I was able to bring the basic transform processing up on the CV1800B under Linux without difficulty and some benchmarking suggested the 4096-point transform I needed would run in about 1ms - well within the 10ms/buffer that I had available. Given two transforms, the phase vocoder and any unique processing required it seemed there would be enough CPU cycles to get some spectral effects going and the load calculations in my audio test harness showed that basic forward + reverse transforms were taking about 27% of the CPU. Unfortunately the combination of all the I/O, UI and DSP plus background processing for the whole system pushed the total load to over 50% which caused time-critical audio I/O processing to miss its schedule and quickly hang the processor.
 
-I lashed up a quick test case with none of the UI and ADC features - just audio I/O and FFTs and this would run for almost a minute with just 27% foreground CPU load before also succumbing to the I/O errors. Compare this to the same algorithms that run with no difficulty on the Arm CPU at less than half the clock speed of the CV1800B when operating in a "bare metal" environment.
+Things were looking pretty grim for a while and it seemed like there was no way to get my frequency domain algorithms working on this platform but then an old friend with vastly more experience in embedded Linux came to the rescue. Vlad of [VPME.de](https://vpme.de/) has worked on consumer-grade Linux-based media players and suggested some simple tweaks to the way I was handling my audio thread that boosted its priority above the other things going on and I've now had CPU loads in excess of 50% running for hours without errors. Experience counts!
 
 ###### DSP Summary
 
-The CV1800B SoC under Linux works fine for lightly loaded audio effects but struggles to complete its computations in the allotted time when loads exceed about 25% of total CPU cycles available. Frequency domain effects that require large FFTs can easily exceed this restriction and quickly fail to meet the timing deadlines that ensure audio processing can continue without interruptions. 
-
-There may be ways to mitigate this:
-
-- Study and possibly re-work the audio I/O handling thread to move the processing delay outside of the critical read->write cycle. [EDIT - I've tried this and it does help somewhat, but I/O errors still occur after a few minutes of runtime]
+With proper understanding of the finer points of Linux userspace coding, the CV1800B SoC under Linux works fine for audio effects in both time and frequency domains. There are still some optimizations that may help to attain even greater processor loads than those seen on the simpler frequency domain algorithms I've tested so far:
 
 - Optimize the FFT algorithm to take advantage of the RISC-V vector (RVV) extensions. RVV is available on the CV1800B SoC's two THead C906 cores and SIMD processing has been shown to provide approximately 30-40% increase in performane on other achitectures. Although the pffft library already supports SIMD optimization on x86, ARM and PPC, a quick analysis suggests that extensive effort would be required add RVV capability due to differences in the way it is implemented vs older architectures.
 
