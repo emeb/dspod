@@ -12,3 +12,4 @@ The collection consists of the following hardware
   with 64MB RAM, SD card interface, USB and GPIO + audio I/O.
 * [dspod_rp2350](./dspod_rp2350) - a daughterboard with a Raspberry Pi RP2350, 4MB flash, 8MB PSRAM, USB, GPIO and audio I/O.
 * [dspod_esp32s3](./dspod_esp32s3) - a daughterboard with an ESP32 S3 processor, 4MB flash, 2MB PSRAM, USB, RF, GPIO and audio I/O.
+* [dspod_h7r3](./dspod_h7r3) - a daughterboard with an STM32H7R3V8 MCU, QSPI flash or PSRAM, USB, GPIO and audio I/O
