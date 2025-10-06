@@ -2,8 +2,7 @@
 
 ![dspod_cv1800b daughterboard](./doc/dspod_cv1800b.png)
 
-The dspod_cv1800b is a daughterboard comprising a Sophon/CVItek CV1800B Linux SoC
-with 64MB RAM, SD card interface, USB and GPIO + audio I/O.
+The dspod_cv1800b is a daughterboard comprising a Sophgo/CVItek CV1800B Linux SoC with 64MB RAM, SD card interface, USB and GPIO + audio I/O.
 
 ## Abstract
 
@@ -29,7 +28,7 @@ The board is a small 32-pin device with the following features:
 
 ## Design Materials
 
-* [Schematic](./doc/dspod_cv1800b_schematic.pdf)
+* [Schematic](./doc/dspod_cv1800b_schematic.pdf) (PDF)
 * [Bill of Materials](./doc/dspod_cv1800b_BOM.ods) (in LibreOffice Calc spreadsheet format)
 
 ## Hardware
@@ -123,14 +122,24 @@ I was able to bring the basic transform processing up on the CV1800B under Linux
 
 Things were looking pretty grim for a while and it seemed like there was no way to get my frequency domain algorithms working on this platform but then an old friend with vastly more experience in embedded Linux came to the rescue. Vlad of [VPME.de](https://vpme.de/) has worked on consumer-grade Linux-based media players and suggested some simple tweaks to the way I was handling my audio thread that boosted its priority above the other things going on and I've now had CPU loads in excess of 50% running for hours without errors. Experience counts!
 
+###### FFT optimization
+
+Initially I had chosen pffft to handle the transforms required for spectral effects, partly because it was well regarded in the open source community, but also because it had SIMD support for several architectures (x86, Arm NEON and PPC Altivec) which led me to believe that it would be easily converted to the RISC-V vector extensions aka [RVV](https://riscv.org/wp-content/uploads/2024/12/15.20-15.55-18.05.06.VEXT-bcn-v1.pdf) which are available on the CV1800B SoC. During testing of pffft I saw approx 30% speedup on x86 when enabling SIMD and was hoping for similar gains with RVV. Unfortunately, the architecture of RVV is sufficiently different from older SIMD implementations that adding it to pffft would have been a large undertaking so instead I looked at simpler FFT libraries that might be more easily modified. After hunting for a while I came back to the original Arm CMSIS DSP library that had been used on the STM32. Benchmarking these against pffft I discovered that for a 4k transform, the radix-4 core with loop unrolling enabled provides about a 30% improvement. Starting with this I experimented with some simple vector optimizations and found that the scalar math used in the radix-4 butterfly was already highly streamlined and my attempts to vectorize it just made it worse. As it stands now I'm seeing the 4k FFT/IFFT running in under 600us which is fast enough to support the spectral effects with sufficient headroom.
+
 ###### DSP Summary
 
 With proper understanding of the finer points of Linux userspace coding, the CV1800B SoC under Linux works fine for audio effects in both time and frequency domains. There are still some optimizations that may help to attain even greater processor loads than those seen on the simpler frequency domain algorithms I've tested so far:
 
-- Optimize the FFT algorithm to take advantage of the RISC-V vector (RVV) extensions. RVV is available on the CV1800B SoC's two THead C906 cores and SIMD processing has been shown to provide approximately 30-40% increase in performane on other achitectures. Although the pffft library already supports SIMD optimization on x86, ARM and PPC, a quick analysis suggests that extensive effort would be required add RVV capability due to differences in the way it is implemented vs older architectures.
+- Explore further ways to optimize the FFT algorithm to take advantage of RVV. My first forays into this were naive and didn't pan out, but more clever approaches might improve matters. There have been reports that RVV could provide significant gains for FFTs, but details of these studies are not publicly available at this time.
+
+- Study the possibilities of using the NPU provided on the SoC. The CV1800B has a 0.5 TOPS neural processing unit that supports int8 data. While it's primarily intended for video analysis tasks, with sufficiently clever handling it might be applied to audio DSP as well. There is very little documentation available, but plenty of source code for the examples provided by the manufacturer.
 
 - Move the DSP operations onto the currently unused secondary RISC-V core. That core runs at only 700MHz but would be completely free of any other critical loads beyond handling the crucial computations and so might provide an overall performance boost.
 
 - Abandon Linux altogether and run "bare metal" - there are already some open-source attempts to create a build environment to explore this option. It will be an uphill battle due to lack of comprehensive documentation on the hardware resources, but if possible would lead to the most optimum environment for running realtime DSP.
 
-I'll continue to pursue these and other avenues to improve the situation on the CV1800B. Although the manufacturer has recently announced the chip is no longer being sold (EOL), there are other parts in the family that are sufficiently similar that this effort may still be useful on future hardware.
+I'll continue to pursue these and other avenues to improve the situation on the CV1800B.
+
+#### Wrap up
+
+The dspod_cv1800b board shows that an inexpensive commodity SoC targeted at consumer-grade IoT applications can perform well for audio effects with decent quality and an inexpensive price point. Although the manufacturer has recently announced the chip is no longer being sold (EOL), there are other parts in the family that are sufficiently similar that this effort may still be useful on future hardware.
