@@ -2,7 +2,9 @@
 
 This directory contains various RPi Pico SDK projects for testing out the dspod_rp2350. There are six separate projects, some with overlapping functionality:
 
-- dspod_blinky  - the traditional blinking LED for initial proof-of-life after assembly.
+- dspod_app - the primary application that ties everything together to realize a multi-effects processor with stereo audio I/O, 4 CV inputs, an LCD + encoder UI and a small selection of effects. This release includes a limited set of effects including a gain control, several filters and a simple delay.
+
+- dspod_blinky - the traditional blinking LED for initial proof-of-life after assembly.
 
 - dspod_adc - testing out the 4-channel ADC inputs.
 
@@ -29,5 +31,3 @@ cd build
 cmake ..
 make
 ```
-
-
