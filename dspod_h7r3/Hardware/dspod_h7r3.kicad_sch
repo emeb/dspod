@@ -9,6 +9,113 @@
 		(date "2023-08-13")
 	)
 	(lib_symbols
+		(symbol "Connector:TestPoint"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.762)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "TP"
+				(at 0 6.858 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TestPoint"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 5.08 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 5.08 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "test point"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "test point tp"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Pin* Test*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TestPoint_0_1"
+				(circle
+					(center 0 3.302)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TestPoint_1_1"
+				(pin passive line
+					(at 0 0 90)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:USB_C_Receptacle_USB2.0_16P"
 			(pin_names
 				(offset 1.016)
@@ -4348,7 +4455,7 @@
 				(pin bidirectional line
 					(at -22.86 -41.91 90)
 					(length 5.08)
-					(name "PD1"
+					(name "PO1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6806,6 +6913,16 @@
 		)
 		(uuid "22af8afc-bc17-4457-92ac-0d02a05b70a5")
 	)
+	(text "Alternate XSPI chip select\nfor 2nd memory."
+		(exclude_from_sim no)
+		(at 166.37 200.914 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "2b65a0e2-ceec-43ae-af04-59aa271e1c71")
+	)
 	(text "Can also load 150-mil SOIC-8 flash\neg W25Q32JVSNIQ or GD25Q32CTIGR.\nNOT - W25QxxSSIQ (those are 208)"
 		(exclude_from_sim no)
 		(at 231.902 207.264 0)
@@ -7252,10 +7369,6 @@
 		(uuid "6763d588-017f-44bb-8104-d9ea1d37a853")
 	)
 	(no_connect
-		(at 200.66 95.25)
-		(uuid "69a2cb07-5236-4773-92a0-0be289988ee4")
-	)
-	(no_connect
 		(at 200.66 107.95)
 		(uuid "6a9dd84c-8969-4db1-8213-bff1a7b1d70a")
 	)
@@ -7266,10 +7379,6 @@
 	(no_connect
 		(at 200.66 125.73)
 		(uuid "7dc8c722-2d25-4b44-9e0f-4b1a670a66b1")
-	)
-	(no_connect
-		(at 200.66 92.71)
-		(uuid "7e0d1694-cc87-468f-ad9d-1d918bfc8152")
 	)
 	(no_connect
 		(at 171.45 73.66)
@@ -7286,10 +7395,6 @@
 	(no_connect
 		(at 143.51 157.48)
 		(uuid "a82f9adc-0964-4a35-b582-6f4652f87574")
-	)
-	(no_connect
-		(at 135.89 157.48)
-		(uuid "a9b3365c-8b9b-450b-add4-f5fb84e49e28")
 	)
 	(no_connect
 		(at 344.17 162.56)
@@ -7662,6 +7767,16 @@
 			(type default)
 		)
 		(uuid "15c1fbdd-cc49-46e1-b289-3b132fb86cb5")
+	)
+	(wire
+		(pts
+			(xy 135.89 157.48) (xy 135.89 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "15ef134d-a13e-4d01-ac06-f967e889f7d7")
 	)
 	(wire
 		(pts
@@ -8295,6 +8410,16 @@
 	)
 	(wire
 		(pts
+			(xy 200.66 92.71) (xy 218.44 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "42d31cc8-c720-493a-9003-ee6794200e46")
+	)
+	(wire
+		(pts
 			(xy 115.57 49.53) (xy 138.43 49.53)
 		)
 		(stroke
@@ -8422,6 +8547,16 @@
 			(type default)
 		)
 		(uuid "540772ee-5b2c-4db6-961a-1535b0123f22")
+	)
+	(wire
+		(pts
+			(xy 119.38 171.45) (xy 119.38 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "54f6605f-816b-436f-b1e2-c835fd56af45")
 	)
 	(wire
 		(pts
@@ -9355,6 +9490,16 @@
 	)
 	(wire
 		(pts
+			(xy 200.66 95.25) (xy 218.44 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a645029a-6259-4ce6-a3d2-b96bfc82e63b")
+	)
+	(wire
+		(pts
 			(xy 345.44 54.61) (xy 328.93 54.61)
 		)
 		(stroke
@@ -9522,6 +9667,16 @@
 			(type default)
 		)
 		(uuid "b70f558b-faea-499d-a4ae-2d6d2362863f")
+	)
+	(wire
+		(pts
+			(xy 135.89 171.45) (xy 119.38 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b7755f1e-9a0a-418f-9533-5a19871206e8")
 	)
 	(wire
 		(pts
@@ -10005,6 +10160,16 @@
 	)
 	(wire
 		(pts
+			(xy 119.38 195.58) (xy 157.48 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e5c46bd5-6f4d-4e22-855e-dfdc6dfa297c")
+	)
+	(wire
+		(pts
 			(xy 60.96 231.14) (xy 60.96 226.06)
 		)
 		(stroke
@@ -10022,6 +10187,16 @@
 			(type default)
 		)
 		(uuid "e639c708-ef40-4bcc-beb1-4263820333b0")
+	)
+	(wire
+		(pts
+			(xy 218.44 92.71) (xy 218.44 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e64ef2b1-f0d4-4d16-b86d-7d901342ee07")
 	)
 	(wire
 		(pts
@@ -10563,7 +10738,7 @@
 		)
 		(uuid "4b3f5530-41de-4f88-b55b-7a20b342e460")
 	)
-	(label "XSPI_NCS"
+	(label "XSPI_NCS1"
 		(at 199.39 185.42 180)
 		(effects
 			(font
@@ -10673,7 +10848,7 @@
 		)
 		(uuid "6b9cb146-edac-4d9a-bb0e-58ee1746b8a9")
 	)
-	(label "XSPI_NCS"
+	(label "XSPI_NCS1"
 		(at 186.69 157.48 270)
 		(effects
 			(font
@@ -11032,6 +11207,16 @@
 			(justify left bottom)
 		)
 		(uuid "b8e6561c-2708-45c0-9c28-898fb13bf049")
+	)
+	(label "XSPI_NCS2"
+		(at 147.32 195.58 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bb707bdb-f889-40bd-9fb2-410982f5d12d")
 	)
 	(label "SWCLK"
 		(at 200.66 110.49 0)
@@ -12987,6 +13172,73 @@
 			(project "dspod_h7r3"
 				(path "/a3b6c254-b136-4d26-bdc3-5008b18820e5"
 					(reference "C29")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 218.44 88.9 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "149b4291-f2d0-42a8-88c5-c4ea125a94c9")
+		(property "Reference" "TP2"
+			(at 223.52 87.6299 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Diag1"
+			(at 223.52 90.1699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 218.44 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 218.44 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 218.44 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9c72327e-7f17-4df9-81f0-a3e28606b182")
+		)
+		(instances
+			(project "dspod_h7r3"
+				(path "/a3b6c254-b136-4d26-bdc3-5008b18820e5"
+					(reference "TP2")
 					(unit 1)
 				)
 			)
@@ -16178,6 +16430,73 @@
 			(project "dspod_h7r3"
 				(path "/a3b6c254-b136-4d26-bdc3-5008b18820e5"
 					(reference "#PWR48")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 218.44 95.25 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6bb667fd-f69d-4264-a562-0e0fc1ea285e")
+		(property "Reference" "TP1"
+			(at 223.52 93.9799 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Diag0"
+			(at 223.52 96.5199 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 218.44 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 218.44 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 218.44 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "71295a5b-d723-47ac-9677-7da86f92b633")
+		)
+		(instances
+			(project "dspod_h7r3"
+				(path "/a3b6c254-b136-4d26-bdc3-5008b18820e5"
+					(reference "TP1")
 					(unit 1)
 				)
 			)
@@ -20937,6 +21256,73 @@
 			(project "dspod_h7r3"
 				(path "/a3b6c254-b136-4d26-bdc3-5008b18820e5"
 					(reference "#PWR060")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 157.48 195.58 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f86e57b8-f45b-4490-85e1-9563cb06db13")
+		(property "Reference" "TP3"
+			(at 162.56 194.3099 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "XSPI_NCS2"
+			(at 162.56 196.8499 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 157.48 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 157.48 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 157.48 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "97be92b5-7e5f-4772-93cf-a32e36d482b6")
+		)
+		(instances
+			(project "dspod_h7r3"
+				(path "/a3b6c254-b136-4d26-bdc3-5008b18820e5"
+					(reference "TP3")
 					(unit 1)
 				)
 			)
