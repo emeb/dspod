@@ -14,7 +14,21 @@ This directory contains various makefile-based projects for testing out the dspo
 
 You'll need to have installed a working Arm GCC toolchain in order to use these projects, as well as a version of OpenOCD or Black Magic Probe that supports the STM32H7R3 for loading code into flash. The Makefiles in each project directory will have to be edited to point to these tools.
 
+### GCC
 
+I use the Arm GCC toolchain from this site: https://developer.arm.com/Tools%20and%20Software/GNU%20Toolchain
+
+### OpenOCD
+
+OpenOCD is the tool used to communicate with SWD port on the STM32H7R3 MCU in order to load binary code into the on-chip flash memory. The mainline tool is fairly slow to change and can take several years to add support for new devices, so the STM32H7R3 is not yet in the database for mainline. ST however provides a forked version of OpenOCD that quickly adds their own products and is available with the installation of their proprietary [STM32CubeIDE | Software - STMicroelectronics](https://www.st.com/en/development-tools/stm32cubeide.html) 
+
+I was able to use this version to successfully program the STM32H7R3 but it does require some fiddling to discover the location of the executable binary and provide it with the location of the necessary scripts
+
+- Install STM32CubeIDE from the link above (warning - it's big)
+
+- Find the executable binary and add the path to the project Makefile. I found mine at`~/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.linux64_2.4.200.202505051030/tools/bin/openocd`
+
+- Make sure to set the environment variable that OpenOCD needs to find its scripts. Mine was at `export OPENOCD_SCRIPTS=~/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.100.202501240831/resources/openocd/st_scripts`
 
 ## Building
 
