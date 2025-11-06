@@ -38,4 +38,4 @@ The hardware design is provided in Kicad 9.x format in the [Hardware](./Hardware
 
 ## Firmware
 
-Firmware is TBD.
+Firmware projects for testing the various subsystem drivers are provided in the [Firmware](./Firmware) direcory.
