@@ -18,12 +18,13 @@
 #define DIAG_HIGH()
 #endif
 
-ADC_HandleTypeDef hadc1;
-DMA_NodeTypeDef Node_GPDMA1_Channel2;
-DMA_QListTypeDef List_GPDMA1_Channel2;
-DMA_HandleTypeDef handle_GPDMA1_Channel2;
+ADC_HandleTypeDef hadc1 ;//__attribute__ ((section (".ram_data")));
+DMA_NodeTypeDef Node_GPDMA1_Channel2 __attribute__ ((section (".sramahb_data")));
+DMA_QListTypeDef List_GPDMA1_Channel2 ;//__attribute__ ((section (".sramahb_data")));
+DMA_HandleTypeDef handle_GPDMA1_Channel2 ;//__attribute__ ((section (".sramahb_data")));
 
-int16_t adc_buffer[ADC_BUFSZ], adc_proc_buffer[ADC_BUFSZ];
+int16_t adc_buffer[ADC_BUFSZ] __attribute__ ((section (".sramahb_data")));
+volatile int16_t ADC_val[ADC_BUFSZ];
 
 /**
   * @brief  This function is executed in case of error occurrence.
@@ -50,6 +51,10 @@ void ADC_Init(void)
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
     PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_CLKP;
     HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
+
+	/* enable the AHB SRAMs for DMA buffers */
+	__HAL_RCC_SRAM1_CLK_ENABLE();
+	__HAL_RCC_SRAM2_CLK_ENABLE();
 
     /* Peripheral clock enable */
     __HAL_RCC_ADC12_CLK_ENABLE();
@@ -222,6 +227,12 @@ void ADC_Init(void)
 		Error_Handler();
 	}
 	
+#ifdef USE_CACHE
+	/* flush linked list? */
+	uint32_t *clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel2 & ~0x1f);
+	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef)+0x20);
+#endif
+
 	/* Point DMA chl at the linked list */
 	uint32_t cllr_mask = DMA_CLLR_UT1 | DMA_CLLR_UT2 | DMA_CLLR_UB1 | DMA_CLLR_USA | DMA_CLLR_UDA | DMA_CLLR_ULL;
 	handle_GPDMA1_Channel2.Instance->CLBAR = ((uint32_t)handle_GPDMA1_Channel2.LinkedListQueue->Head & DMA_CLBAR_LBA);
@@ -246,7 +257,7 @@ void ADC_Init(void)
  */
 int16_t ADC_GetChl(uint8_t chl)
 {
-	return adc_proc_buffer[chl];
+	return ADC_val[chl];
 }
 
 /**
@@ -263,8 +274,22 @@ void GPDMA1_Channel2_IRQHandler(void)
 		/* Clear the Interrupt flag */
 		GPDMA1_Channel2->CFCR = DMA_CFCR_TCF;
 		
-		/* grab rx from previous */
-		memcpy(adc_proc_buffer, adc_buffer, ADC_BUFSZ*sizeof(int16_t));
+#ifdef USE_CACHE
+		/* invalidate Dcache of ADC buffer */
+		uint32_t *inval_addr = (uint32_t *)((uint32_t)adc_buffer & ~0x1f);
+		SCB_InvalidateDCache_by_Addr(inval_addr, ADC_BUFSZ+32);
+#endif
+		
+		/* grab rx from previous, invert, etc */
+		//memcpy((int16_t *)ADC_val, adc_buffer, ADC_BUFSZ*sizeof(int16_t));
+		for(int i=0;i<ADC_BUFSZ;i++)
+		{
+			/* invert & scale to full 12-bit range */
+			int32_t temp = (4095-adc_buffer[i]) * 4172;
+			
+			/* normalize & saturate */
+			ADC_val[i] = __USAT((temp >> 12), 12);
+		}
 	}
     	
 	/* Lower activity flag */

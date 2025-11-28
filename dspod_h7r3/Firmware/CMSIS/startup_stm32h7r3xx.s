@@ -42,6 +42,11 @@ defined in linker script */
 /* end address for the .bss section. defined in linker script */
 .word  _ebss
 
+/* EMEB - new stuff for CCMRAM init */
+.word  _siitcm_code
+.word  _sitcm_code
+.word  _eitcm_code
+
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely
@@ -76,6 +81,24 @@ LoopCopyDataInit:
   adds r4, r0, r3
   cmp r4, r1
   bcc CopyDataInit
+
+/* EMEB - start new stuff for ITCM init */
+  movs  r1, #0
+  b  LoopCopyCCMInit
+
+CopyCCMInit:
+  ldr  r3, =_siitcm_code
+  ldr  r3, [r3, r1]
+  str  r3, [r0, r1]
+  adds  r1, r1, #4
+    
+LoopCopyCCMInit:
+  ldr  r0, =_sitcm_code
+  ldr  r3, =_eitcm_code
+  adds  r2, r0, r1
+  cmp  r2, r3
+  bcc  CopyCCMInit
+/* EMEB - end */
 
 /* Zero fill the bss segment. */
   ldr r2, =_sbss

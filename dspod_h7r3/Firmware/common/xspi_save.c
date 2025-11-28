@@ -4,7 +4,6 @@
  */
 
 #include "xspi.h"
-#include <string.h>
 #include "printf.h"
 
 /* uncomment this to run the memory in QUAD mode */
@@ -21,34 +20,6 @@ static void Error_Handler(void)
 	while(1)
 	{
 	}
-}
-
-/* dump XSPI1 regs for diags */
-void dump_regs(void)
-{
-#if 0
-	uint32_t *regptr = (uint32_t *)XSPI1;
-	for(int i=0;i<0x228;i+=16)
-	{
-		printf("%08X: ", regptr);
-		for(int j=0;j<16;j+=4)
-		{
-			printf("%08X ", *regptr++);
-		}
-		printf("\n\r");
-	}
-#else
-	printf("XSPI1->CCR : 0x%08X\n\r", XSPI1->CCR);
-	printf("XSPI1->TCR : 0x%08X\n\r", XSPI1->TCR);
-	printf("XSPI1->IR  : 0x%08X\n\r", XSPI1->IR);
-	printf("XSPI1->ABR : 0x%08X\n\r", XSPI1->ABR);
-	printf("--------\n\r");
-	printf("XSPI1->WCCR : 0x%08X\n\r", XSPI1->WCCR);
-	printf("XSPI1->WTCR : 0x%08X\n\r", XSPI1->WTCR);
-	printf("XSPI1->WIR  : 0x%08X\n\r", XSPI1->WIR);
-	printf("XSPI1->WABR : 0x%08X\n\r", XSPI1->WABR);
-	printf("===========================\n\r");
-#endif
 }
 
 /*
@@ -101,19 +72,19 @@ void xspi_init(void)
 
 	/* XSPI1 parameter configuration*/
 	hxspi1.Instance = XSPI1;
-	hxspi1.Init.FifoThresholdByte = 1;
+	hxspi1.Init.FifoThresholdByte = 4;
 	hxspi1.Init.MemoryMode = HAL_XSPI_SINGLE_MEM;
-	hxspi1.Init.MemoryType = HAL_XSPI_MEMTYPE_APMEM;
+	hxspi1.Init.MemoryType = HAL_XSPI_MEMTYPE_MICRON;
 	hxspi1.Init.MemorySize = HAL_XSPI_SIZE_64MB;
-	hxspi1.Init.ChipSelectHighTimeCycle = 2;	// 27ns @ 75MHz (min is 18ns)
+	hxspi1.Init.ChipSelectHighTimeCycle = 1;
 	hxspi1.Init.FreeRunningClock = HAL_XSPI_FREERUNCLK_DISABLE;
 	hxspi1.Init.ClockMode = HAL_XSPI_CLOCK_MODE_0;
 	hxspi1.Init.WrapSize = HAL_XSPI_WRAP_NOT_SUPPORTED;
-	hxspi1.Init.ClockPrescaler = 2;	// 75MHz (max is 85MHz for linear bursts)
+	hxspi1.Init.ClockPrescaler = 4;
 	hxspi1.Init.SampleShifting = HAL_XSPI_SAMPLE_SHIFT_NONE;
 	hxspi1.Init.DelayHoldQuarterCycle = HAL_XSPI_DHQC_DISABLE;
 	hxspi1.Init.ChipSelectBoundary = HAL_XSPI_BONDARYOF_NONE;
-	hxspi1.Init.MaxTran = 225;	// 3us @ 75MHz (max is 3us)
+	hxspi1.Init.MaxTran = 0;
 	hxspi1.Init.Refresh = 0;
 	hxspi1.Init.MemorySelect = HAL_XSPI_CSSEL_NCS1;
 	if (HAL_XSPI_Init(&hxspi1) != HAL_OK)
@@ -187,7 +158,6 @@ void xspi_writebytes(uint32_t addr, uint8_t *data, uint32_t sz)
 {
 	HAL_StatusTypeDef stat;
 
-	sCommand.OperationType      = HAL_XSPI_OPTYPE_COMMON_CFG;
 	sCommand.Address			= addr;
 	sCommand.Instruction 		= 0x38;		// SPI QUAD WRITE
 	sCommand.DummyCycles		= 0;
@@ -213,7 +183,6 @@ void xspi_readbytes(uint32_t addr, uint8_t *data, uint32_t sz)
 {
 	HAL_StatusTypeDef stat;
 
-	sCommand.OperationType      = HAL_XSPI_OPTYPE_COMMON_CFG;
 	sCommand.Address			= addr;
 	sCommand.Instruction 		= 0xEB;		// SPI QUAD READ
 	sCommand.DummyCycles		= 6;
@@ -239,34 +208,30 @@ void xspi_memmap(uint8_t enable)
 {
 	if((hxspi1.State != HAL_XSPI_STATE_BUSY_MEM_MAPPED) && enable)
 	{
-		/* set write & read ops & turn on mem mapped mode */
-		sCommand.OperationType		= HAL_XSPI_OPTYPE_WRITE_CFG;
-		sCommand.Instruction 		= 0x38;		// SPI QUAD WRITE
-		sCommand.DummyCycles		= 0;
-		sCommand.DQSMode            = HAL_XSPI_DQS_ENABLE; // ERRATUM 2.4.1
-		if (HAL_XSPI_Command(&hxspi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-		{
-			Error_Handler();
-		}
-		
+		/* turn on mem mapped mode */
 		sCommand.OperationType		= HAL_XSPI_OPTYPE_READ_CFG;
 		sCommand.Instruction 		= 0xEB;		// SPI QUAD READ
 		sCommand.DummyCycles		= 6;
-		sCommand.DQSMode            = HAL_XSPI_DQS_DISABLE;	// return to correct value
+
 		if (HAL_XSPI_Command(&hxspi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
 		{
 			Error_Handler();
 		}
 
-		sMemMappedCfg.TimeOutActivation = HAL_XSPI_TIMEOUT_COUNTER_ENABLE;
-		sMemMappedCfg.TimeoutPeriodClock      = 0x34;
-		if (HAL_XSPI_MemoryMapped(&hxspi1, &sMemMappedCfg) != HAL_OK)
+		sCommand.OperationType		= HAL_XSPI_OPTYPE_WRITE_CFG;
+		sCommand.Instruction 		= 0x38;		// SPI QUAD WRITE
+
+		if (HAL_XSPI_Command(&hxspi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
 		{
 			Error_Handler();
 		}
 		
-		/* wait a bit for things to settle */
-		HAL_Delay(1);
+		sMemMappedCfg.TimeOutActivation = HAL_XSPI_TIMEOUT_COUNTER_DISABLE;
+
+		if (HAL_XSPI_MemoryMapped(&hxspi1, &sMemMappedCfg) != HAL_OK)
+		{
+			Error_Handler();
+		}
 	}
 	else if((hxspi1.State == HAL_XSPI_STATE_BUSY_MEM_MAPPED) && !enable)
 	{
@@ -293,6 +258,9 @@ void xspi_memmap(uint8_t enable)
 
 		/* Update xspi state */
 		hxspi1.State = HAL_XSPI_STATE_READY;
+		
+		/* restore common type */
+		sCommand.OperationType      = HAL_XSPI_OPTYPE_COMMON_CFG;
 	}
 }
 
@@ -301,7 +269,8 @@ void xspi_memmap(uint8_t enable)
  */
 
 //#define xspi_TEST_LEN xspi_SIZE/4
-#define xspi_TEST_LEN (1<<12)
+#define xspi_TEST_LEN (1<<16)
+//#define xspi_TEST_LEN (1<<4)
 
 /* PRN generator info */
 #define NOISE_POLY_TAP0 31
@@ -311,7 +280,6 @@ void xspi_memmap(uint8_t enable)
 
 uint32_t prn_lfsr;
 uint8_t txbuffer[xspi_TEST_LEN], rxbuffer[xspi_TEST_LEN];
-uint32_t wordbuf[xspi_TEST_LEN];
 
 /**
   * @brief  PRN into destination
@@ -327,14 +295,13 @@ void prn_seed(uint32_t seed)
   * @brief  32-bit PRN
   * @retval 32-bit unsigned result
   */
-uint32_t prn_gen(int8_t nbits)
+uint32_t prn_gen(void)
 {
 	uint8_t bit;
 	uint8_t new_data;
-	uint32_t mask = (1<<(nbits+1))-1;
 
-	/* generate new bits */
-	for(bit=0;bit<nbits;bit++)
+	/* generate 32 new bits */
+	for(bit=0;bit<32;bit++)
 	{
 		new_data = ((prn_lfsr>>NOISE_POLY_TAP0) ^
 					(prn_lfsr>>NOISE_POLY_TAP1) ^
@@ -343,193 +310,132 @@ uint32_t prn_gen(int8_t nbits)
 		prn_lfsr = (prn_lfsr<<1) | (new_data&1);
 	}
 
-	return prn_lfsr & mask;
+	return prn_lfsr;
 }
 
 /*
  * test various xspi access methods
  */
-uint8_t xspi_test(uint8_t testflags)
+uint8_t xspi_test(void)
 {
-	uint32_t i, err, *memword = (uint32_t *)XSPI1_BASE;
-	uint8_t retval = 0, *membyte = (uint8_t *)XSPI1_BASE;
-	
-	/* Indirect mode, 8-bit count sequence */
-	if(testflags & 0x01)
-	{
-		printf("Indirect mode, counting\n\r");
-		printf("Writing %d\n\r", xspi_TEST_LEN);
-		for(i=0;i<xspi_TEST_LEN;i++)
-			txbuffer[i] = i;
+	uint32_t i, *memword;
+	uint8_t err, retval = 0;
 
-		xspi_writebytes(0, txbuffer, xspi_TEST_LEN);
+	printf("Writing %d count\n\r", xspi_TEST_LEN);
+	for(i=0;i<xspi_TEST_LEN;i++)
+		txbuffer[i] = i;
 
-		printf("Reading %d\n\r", xspi_TEST_LEN);
-		xspi_readbytes(0, rxbuffer, xspi_TEST_LEN);
-
-		err = 0;
-		for(i=0;i<xspi_TEST_LEN;i++)
-		{
-			if(txbuffer[i] != rxbuffer[i])
-			{
-				err++;
-				if(testflags & 0x80)
-					printf("%2d : %02X -> %02X\n\r", i, txbuffer[i], rxbuffer[i]);
-			}
-		}
-		if(err==0)
-			printf("Passed.\n\r");
-		else
-		{
-			retval++;
-			printf("Failed %d.\n\r", err);
-		}
-	}
-	
-	/* Memmap mode, 8-bit count sequence */
-	if(testflags & 0x02)
-	{
-		printf("Memmap mode, counting\n\r");
-		xspi_memmap(1);
-		
-#if 1
-		printf("Writing %d\n\r", xspi_TEST_LEN);
-		for(i=0;i<xspi_TEST_LEN;i++)
-		{
-			txbuffer[i] = i+0x10;
-			//printf("%1d : %02X\n\r", i, txbuffer[i]);
-			//membyte[i] = txbuffer[i];
-		}
-		memcpy(membyte, txbuffer, sizeof(txbuffer));
-#endif
-		printf("Reading %d\n\r", xspi_TEST_LEN);
-		err = 0;
-		for(i=0;i<xspi_TEST_LEN;i++)
-		{
-			if(txbuffer[i] != membyte[i])
-			{
-				err++;
-				if(testflags & 0x80)
-					printf("%2d : %02X -> %02X\n\r", i, txbuffer[i], membyte[i]);
-			}
-		}
-		
-		if(err==0)
-			printf("Passed.\n\r");
-		else
-		{
-			retval++;
-			printf("Failed %d.\n\r", err);
-		}
-		
-		xspi_memmap(0);
-	}
-	
-	/* Indirect mode, 8-bit PRN sequence */
-	if(testflags & 0x04)
-	{
-		printf("Indirect mode, PRN\n\r");
-		printf("Writing %d\n\r", xspi_TEST_LEN);
-		prn_seed(0x12345678);
-		for(i=0;i<xspi_TEST_LEN;i++)
-			txbuffer[i] = prn_gen(8);
-		xspi_writebytes(0, txbuffer, xspi_TEST_LEN);
-
-		printf("Reading %d\n\r", xspi_TEST_LEN);
-		xspi_readbytes(0, rxbuffer, xspi_TEST_LEN);
-
-		err = 0;
-		prn_seed(0x12345678);
-		for(i=0;i<xspi_TEST_LEN;i++)
-		{
-			if(txbuffer[i] != rxbuffer[i])
-			{
-				if(testflags & 0x80)
-					printf("%1d : %02X -> %02X\n\r", i, txbuffer[i], rxbuffer[i]);
-				err++;
-			}
-		}
-		
-		if(err==0)
-			printf("Passed.\n\r");
-		else
-		{
-			retval++;
-			printf("Failed %d.\n\r", err);
-		}
-	}
-	
-	/* Memmap mode, 8-bit PRN sequence */
-	if(testflags & 0x08)
-	{
-		printf("Memmap mode, PRN\n\r");
-		xspi_memmap(1);
-		
 #if 0
-		printf("32 bits\n\r");
-#if 1
-		printf("Writing %d\n\r", xspi_TEST_LEN);
-		prn_seed(0xdeadbeef);
-		for(i=0;i<xspi_TEST_LEN/4;i++)
-		{
-			wordbuf[i] = prn_gen(32);
-		}
-		memcpy(memword, wordbuf, sizeof(wordbuf));
+	// infinite writes for testing
+	while(1)
 #endif
-		
-		printf("Reading %d\n\r", xspi_TEST_LEN);
-		err = 0;
-		//SCB_InvalidateDCache_by_Addr((uint32_t *)membyte, xspi_TEST_LEN);
-		prn_seed(0xdeadbeef);
-		for(i=0;i<xspi_TEST_LEN;i++)
+	xspi_writebytes(0, txbuffer, xspi_TEST_LEN);
+
+	printf("Reading %d count\n\r", xspi_TEST_LEN);
+	xspi_readbytes(0, rxbuffer, xspi_TEST_LEN);
+
+	err = 0;
+	for(i=0;i<xspi_TEST_LEN;i++)
+	{
+		if(txbuffer[i] != rxbuffer[i])
 		{
-			uint32_t tstdat = prn_gen(32);
-			if(tstdat != memword[i])
-			{
-				err++;
-				if(testflags & 0x80)
-					printf("%1d : %08X -> %08X\n\r", i, tstdat, memword[i]);
-			}
+			err++;
+			printf("%2d : %02X -> %02X\n\r", i, txbuffer[i], rxbuffer[i]);
 		}
-#else
-		printf("8 bits\n\r");
-#if 1
-		printf("Writing %d\n\r", xspi_TEST_LEN);
-		prn_seed(0xabadcafe);
-		for(i=0;i<xspi_TEST_LEN;i++)
-		{
-			txbuffer[i] = prn_gen(8);
-			//printf("%1d : %02X\n\r", i, tstdat);
-			//membyte[i] = txbuffer[i];
-		}
-		memcpy(membyte, txbuffer, sizeof(txbuffer));
+	}
+	if(err==0)
+		printf("Read %d count passed.\n\r", xspi_TEST_LEN);
+	else
+	{
+		retval++;
+		printf("Read %d count failed.\n\r", xspi_TEST_LEN);
+	}
+
+#if 0
+	xspi_memmap(1);
+	HAL_Delay(1);
+#if 0
+	printf("Mem map writing %d count\n\r", xspi_TEST_LEN);
+	memword = (uint32_t *)XSPI1_BASE;
+	for(i=0;i<xspi_TEST_LEN;i++)
+		memword[i] = 0xffffffff-i;
 #endif
-		
-		printf("Reading %d\n\r", xspi_TEST_LEN);
-		err = 0;
-		//SCB_InvalidateDCache_by_Addr((uint32_t *)membyte, xspi_TEST_LEN);
-		prn_seed(0xabadcafe);
-		for(i=0;i<xspi_TEST_LEN;i++)
+	printf("Mem map reading %d count\n\r", xspi_TEST_LEN);
+	err = 0;
+	for(i=0;i<xspi_TEST_LEN;i++)
+	{
+		if(memword[i] != 0xffffffff-i)
 		{
-			if(txbuffer[i] != membyte[i])
-			{
-				err++;
-				if(testflags & 0x80)
-					printf("%1d : %02X -> %02X\n\r", i, txbuffer[i], membyte[i]);
-			}
+			err++;
+			//printf("%2d : %02X -> %02X\n\r", i, 0xffffffff-i, memword[i]);
 		}
+	}
+	xspi_memmap(0);
+	if(err==0)
+		printf("Mem map read %d count passed.\n\r", xspi_TEST_LEN);
+	else
+	{
+		retval++;
+		printf("Mem map read %d count failed.\n\r", xspi_TEST_LEN);
+	}
 #endif
 
-		if(err==0)
-			printf("Passed.\n\r");
-		else
+	printf("Writing %d prn\n\r", xspi_TEST_LEN);
+	prn_seed(0x12345678);
+	for(i=0;i<xspi_TEST_LEN;i++)
+		txbuffer[i] = prn_gen();
+	xspi_writebytes(0, txbuffer, xspi_TEST_LEN);
+
+	printf("Reading %d prn\n\r", xspi_TEST_LEN);
+	xspi_readbytes(0, rxbuffer, xspi_TEST_LEN);
+
+	err = 0;
+	for(i=0;i<xspi_TEST_LEN;i++)
+	{
+		if(txbuffer[i] != rxbuffer[i])
 		{
-			retval++;
-			printf("Failed %d.\n\r", err);
+			printf("%1d : %02X -> %02X\n\r", i, txbuffer[i], rxbuffer[i]);
+			err++;
 		}
-		
-		xspi_memmap(0);
 	}
-	
+	if(err==0)
+		printf("Read %d prn passed.\n\r", xspi_TEST_LEN);
+	else
+	{
+		retval++;
+		printf("Read %d prn failed.\n\r", xspi_TEST_LEN);
+	}
+
+#if 0
+	xspi_memmap(1);
+	HAL_Delay(1);
+	printf("Mem map writing %d count\n\r", xspi_TEST_LEN);
+	prn_seed(0xABADCAFE);
+	for(i=0;i<xspi_TEST_LEN;i++)
+		memword[i] = prn_gen();
+
+	printf("Mem map reading %d prn\n\r", xspi_TEST_LEN);
+	err = 0;
+	//SCB_InvalidateDCache_by_Addr((uint32_t *)membyte, xspi_TEST_LEN);
+	prn_seed(0xABADCAFE);
+	for(i=0;i<xspi_TEST_LEN;i++)
+	{
+		uint32_t prn = prn_gen();
+		if(prn != memword[i])
+		{
+			err++;
+			printf("%1d : %02X -> %02X\n\r", i, prn, memword[i]);
+		}
+	}
+	xspi_memmap(0);
+	if(err==0)
+		printf("Mem map read %d prn passed.\n\r", xspi_TEST_LEN);
+	else
+	{
+		retval++;
+		printf("Mem map read %d prn failed.\n\r", xspi_TEST_LEN);
+	}
+#endif
+
 	return 0;
 }

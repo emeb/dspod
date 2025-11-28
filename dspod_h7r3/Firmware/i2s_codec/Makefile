@@ -51,15 +51,16 @@ GDB = $(ARCH)-gdb
 ## Mainline OpenOCD installed in /usr/local
 #OPENOCD = openocd
 
-## ST's fork of OpenOCD - need to 
-## export OPENOCD_SCRIPTS=/home/ericb/build/openocd/stm32oocd/OpenOCD/tcl/
+## ST's fork of OpenOCD from https://github.com/STMicroelectronics/OpenOCD
+## branch openocd-cubeide-r6
+## need to export OPENOCD_SCRIPTS=/home/ericb/build/openocd/stm32oocd/OpenOCD/tcl/
 ## before using
-#OPENOCD = ~/build/openocd/stm32oocd/OpenOCD/src/openocd
+OPENOCD = ~/build/openocd/stm32oocd/OpenOCD/src/openocd
 
 ## OOCD from STM32CubeIDE - need to
 ## export OPENOCD_SCRIPTS=/home/ericb/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.100.202501240831/resources/openocd/st_scripts
 ## before using
-OPENOCD = /home/ericb/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.linux64_2.4.200.202505051030/tools/bin/openocd
+#OPENOCD = /home/ericb/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.linux64_2.4.200.202505051030/tools/bin/openocd
 
 CRYPT = ../crc_calc/crc_calc
 DFU = dfu-util

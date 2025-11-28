@@ -9,9 +9,8 @@
  *
  */
 
-#include "stm32h7rsxx_hal.h"
+#include "main.h"
 #include "usart.h"
-#include "printf.h"
 #include "led.h"
 #include "cyclesleep.h"
 #include "audio.h"
@@ -162,6 +161,14 @@ void SystemClock_Config(void)
 int main(void)
 {
 	uint32_t dg, clkfrq, act, tot;
+	
+#ifdef USE_CACHE
+	/* Enable I-Cache */
+	SCB_EnableICache();
+
+	/* Enable D-Cache */
+	SCB_EnableDCache();
+#endif
 	
 	/* MPU Configuration--------------------------------------------------------*/
 	MPU_Config();

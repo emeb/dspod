@@ -1,17 +1,19 @@
 /*
- * main.c - dspod_h7r3 blinky test program
- * 10-14-25 E. Brombaugh
+ * main.c - dspod_h7r3 lcd test program
+ * 11-13-25 E. Brombaugh
  ******************************************************************************
  * Changelog
  *
- * date: 2025-10-14 V0.0
+ * date: 2025-11-13 V0.0
  * Initial creation
  *
  */
 
 #include "main.h"
 #include "usart.h"
+#include "cyclesleep.h"
 #include "led.h"
+#include "st7789.h"
 
 /* build version in simple format */
 const char *fwVersionStr = "V0.0";
@@ -186,7 +188,7 @@ int main(void)
 	/* init the UART for diagnostics */
 	setup_usart();
 	init_printf(0,usart_putc);
-	printf("\n\n\rdspod_h7r3 blinky\n\r");
+	printf("\n\n\rdspod_h7r3 lcd\n\r");
 	printf("CPUID: 0x%08X\n\r", SCB->CPUID);
 	printf("IDCODE: 0x%08X\n\r", DBGMCU->IDCODE);
 	printf("Version: %s\n\r", fwVersionStr);
@@ -196,9 +198,67 @@ int main(void)
 	printf("SYSCLK = %d\n\r", HAL_RCC_GetSysClockFreq());
 	printf("\n");
 	
+	/* initialize cycle counter */
+	cyccnt_enable();
+	printf("Cycle Counter initialized\n\r");
+	
 	/* initialize LEDs */
 	LEDInit();
 	printf("LED initialized\n\r");
+	
+	/* set up LCD SPI & GPIO */
+	gfx_init(&ST7789_drvr);
+	start_meas();
+	gfx_clrscreen();
+	end_meas();
+	uint32_t act, tot;
+	get_meas(&act, &tot);
+	printf("Clearscreen CPU cycles: %d (%d us)\n\r", act, act/(HAL_RCC_GetSysClockFreq()/1000000));
+	#if 0
+	gfx_drawstr(0, 0, "Hello World!");
+	gfx_set_forecolor(GFX_RED);
+	gfx_fillcircle(40, 60, 30);
+	gfx_set_forecolor(GFX_GREEN);
+	gfx_fillcircle(70, 90, 30);
+	gfx_set_forecolor(GFX_BLUE);
+	gfx_fillcircle(100, 120, 30);
+#endif
+#if 0
+	printf("Test offsets.\n\r");
+	gfx_drawline(0, 0, 319, 169);
+	gfx_drawline(319, 0, 0, 169);
+	gfx_drawstr(0, 0, "0, 0");
+	gfx_drawstr(160, 85, "160, 85");
+	gfx_drawstr(255, 161, "255, 161");
+#else
+	printf("Rounded rects\n\r");
+	GFX_RECT rect = {2,2,317,167};
+	gfx_fillroundedrect(&rect, 20);
+	
+	rect.x0 = 50;
+	rect.y0 = 50;
+	rect.x1 = 150;
+	rect.y1 = 150;
+	gfx_set_forecolor(GFX_CYAN);
+	gfx_fillroundedrect(&rect, 20);
+	
+	rect.x0 = 200;
+	rect.y0 = 20;
+	rect.x1 = 250;
+	rect.y1 = 160;
+	gfx_set_forecolor(GFX_MAGENTA);
+	gfx_fillroundedrect(&rect, 50);
+	
+	rect.x0 = 20;
+	rect.y0 = 10;
+	rect.x1 = 170;
+	rect.y1 = 40;
+	gfx_set_forecolor(GFX_BLUE);
+	gfx_fillroundedrect(&rect, 5);
+#endif
+
+	ST7789_backlight(1);
+	printf("LCD & GFX initialized\n\r");
 		
     /* Infinite loop */
 	printf("Looping...\n\r");

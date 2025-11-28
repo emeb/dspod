@@ -15,6 +15,6 @@ void xspi_init(void);
 void xspi_writebytes(uint32_t addr, uint8_t *data, uint32_t sz);
 void xspi_readbytes(uint32_t addr, uint8_t *data, uint32_t sz);
 void xspi_memmap(uint8_t enable);
-uint8_t xspi_test(void);
+uint8_t xspi_test(uint8_t testflags);
 
 #endif

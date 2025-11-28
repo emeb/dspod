@@ -6,12 +6,11 @@ VPATH = .:../common:../CMSIS:../HAL
 
 # Object files
 OBJECTS = 	startup_stm32h7r3xx.o system_stm32h7rsxx.o main.o led.o usart.o printf.o \
-			adc.o \
+			gfx.o font_8x8.o st7789.o shared_spi.o cyclesleep.o \
 			stm32h7rsxx_hal.o stm32h7rsxx_hal_cortex.o stm32h7rsxx_hal_gpio.o \
             stm32h7rsxx_hal_rcc.o stm32h7rsxx_hal_rcc_ex.o stm32h7rsxx_hal_pwr_ex.o \
-            stm32h7rsxx_hal_usart.o stm32h7rsxx_hal_adc.o stm32h7rsxx_hal_adc_ex.o \
-			stm32h7rsxx_hal_dma.o stm32h7rsxx_hal_dma_ex.o
-			
+            stm32h7rsxx_hal_usart.o stm32h7rsxx_hal_spi.o \
+
 # Linker script
 LDSCRIPT = stm32h7r3xx_flash.ld
 

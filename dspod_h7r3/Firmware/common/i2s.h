@@ -6,10 +6,10 @@
 #ifndef __i2s__
 #define __i2s__
 
-#include "stm32h7rsxx_hal.h"
+#include "main.h"
 #include "audio.h"
 
-#define I2S_BUFSZ (SMPS*CHLS)
+#define I2S_BUFSZ BUFSZ
 
 void i2s_init(void);
 void i2s_start(void);

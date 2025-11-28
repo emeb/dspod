@@ -6,11 +6,12 @@
 #ifndef __adc__
 #define __adc__
 
-#include "stm32h7rsxx_hal.h"
+#include "main.h"
 
 #define ADC_BUFSZ 4
 
+extern volatile int16_t ADC_val[ADC_BUFSZ];
+
 void ADC_Init(void);
-int16_t ADC_GetChl(uint8_t chl);
 
 #endif

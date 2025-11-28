@@ -9,9 +9,8 @@
  *
  */
 
-#include "stm32h7rsxx_hal.h"
+#include "main.h"
 #include "usart.h"
-#include "printf.h"
 #include "led.h"
 #include "xspi.h"
 
@@ -153,7 +152,16 @@ void SystemClock_Config(void)
  */
 int main(void)
 {
+#ifdef USE_CACHE
+	/* Enable I-Cache */
+	SCB_EnableICache();
+
+	/* Enable D-Cache */
+	SCB_EnableDCache();
+#endif
+	
 	/* MPU Configuration--------------------------------------------------------*/
+	// memmap read of XSPI PSRAM causes memmap fault. why?
 	//MPU_Config();
 	
     /* STM32H7xx HAL library initialization:
@@ -198,7 +206,7 @@ int main(void)
 	xspi_init();
 	printf("XSPI initialized\n\r");
 	printf("Testing XSPI...\n\r");
-	uint8_t xspi_result = xspi_test();
+	uint8_t xspi_result = xspi_test(0x8f);
 	printf("Result = %d\n\r", xspi_result);
 	
     /* Infinite loop */

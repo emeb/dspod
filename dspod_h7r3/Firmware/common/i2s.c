@@ -42,16 +42,16 @@
 I2S_HandleTypeDef hi2s6;
 
 /* structures used by linked-list mode which is essential for circular DMA */
-DMA_NodeTypeDef Node_GPDMA1_Channel1;
-DMA_QListTypeDef List_GPDMA1_Channel1;
-DMA_HandleTypeDef handle_GPDMA1_Channel1;
-DMA_NodeTypeDef Node_GPDMA1_Channel0;
-DMA_QListTypeDef List_GPDMA1_Channel0;
-DMA_HandleTypeDef handle_GPDMA1_Channel0;
+DMA_NodeTypeDef Node_GPDMA1_Channel1 __attribute__ ((section (".sramahb_data")));
+DMA_QListTypeDef List_GPDMA1_Channel1 ;//__attribute__ ((section (".sramahb_data")));
+DMA_HandleTypeDef handle_GPDMA1_Channel1 ;//__attribute__ ((section (".sramahb_data")));
+DMA_NodeTypeDef Node_GPDMA1_Channel0 __attribute__ ((section (".sramahb_data")));
+DMA_QListTypeDef List_GPDMA1_Channel0 ;//__attribute__ ((section (".sramahb_data")));
+DMA_HandleTypeDef handle_GPDMA1_Channel0 ;//__attribute__ ((section (".sramahb_data")));
 
 /* DMA buffers */
-int16_t tx_buffer[I2S_BUFSZ] __attribute__ ((aligned (8))),
-		rx_buffer[I2S_BUFSZ] __attribute__ ((aligned (8))),
+int16_t tx_buffer[I2S_BUFSZ] __attribute__ ((aligned (8))) __attribute__ ((section (".sramahb_data"))),
+		rx_buffer[I2S_BUFSZ] __attribute__ ((aligned (8))) __attribute__ ((section (".sramahb_data"))),
 		in_buffer[I2S_BUFSZ/2];
 
 /**
@@ -72,6 +72,10 @@ void i2s_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+	
+	/* enable the AHB SRAMs for DMA buffers */
+	__HAL_RCC_SRAM1_CLK_ENABLE();
+	__HAL_RCC_SRAM2_CLK_ENABLE();
 	
 #if 0
 	/* preload buffer w/ static ramp */
@@ -211,7 +215,13 @@ void i2s_init(void)
     {
       Error_Handler();
     }
-
+	
+#ifdef USE_CACHE
+	/* flush linked list? */
+	uint32_t *clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel0 & ~0x1f);
+	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef)+0x20);
+#endif
+	
 	/* GPDMA1_REQUEST_SPI1_RX Init */
     NodeConfig.NodeType = DMA_GPDMA_LINEAR_NODE;
     NodeConfig.Init.Request = GPDMA1_REQUEST_SPI6_RX;
@@ -275,6 +285,12 @@ void i2s_init(void)
       Error_Handler();
     }
 	
+#ifdef USE_CACHE
+	/* flush linked list? */
+	clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel1 & ~0x1f);
+	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef));
+#endif
+	
 	/* start up DMA */	
 	uint32_t cllr_mask = DMA_CLLR_UT1 | DMA_CLLR_UT2 | DMA_CLLR_UB1 | DMA_CLLR_USA | DMA_CLLR_UDA | DMA_CLLR_ULL;
 	handle_GPDMA1_Channel0.Instance->CLBAR = ((uint32_t)handle_GPDMA1_Channel0.LinkedListQueue->Head & DMA_CLBAR_LBA);
@@ -331,6 +347,8 @@ int32_t i2s_get_fsamp(void)
   */
 void DMA_TX_CHL_IRQHandler(void)
 {
+	uint32_t *cache_addr;
+	
 	/* Raise activity flag */
 	DIAG_HIGH();
 
@@ -340,11 +358,23 @@ void DMA_TX_CHL_IRQHandler(void)
 		/* Clear the Interrupt flag */
 		DMA_TX_CHL->CFCR = DMA_CFCR_HTF;
 		
+#ifdef USE_CACHE
+		/* invalidate cache on RX DMA */
+		cache_addr = (uint32_t *)((uint32_t)&rx_buffer[I2S_BUFSZ/2] & ~0x1f);
+		SCB_InvalidateDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
+
 		/* grab rx from previous */
 		memcpy(in_buffer, &rx_buffer[I2S_BUFSZ/2], I2S_BUFSZ/2*sizeof(int16_t));
 
 		/* load the first half of the buffers */
 		Audio_Proc(&tx_buffer[0], in_buffer, I2S_BUFSZ/2);
+		
+#ifdef USE_CACHE
+		/* flush DCache to destination */
+		cache_addr = (uint32_t *)((uint32_t)&tx_buffer[0] & ~0x1f);
+		SCB_CleanDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
 	}
 	
 	/* Transfer complete interrupt */
@@ -353,11 +383,23 @@ void DMA_TX_CHL_IRQHandler(void)
 		/* Clear the Interrupt flag */
 		DMA_TX_CHL->CFCR = DMA_CFCR_TCF;
 		
+#ifdef USE_CACHE
+		/* invalidate cache on RX DMA */
+		cache_addr = (uint32_t *)((uint32_t)&rx_buffer[0] & ~0x1f);
+		SCB_InvalidateDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
+
 		/* grab rx from previous */
 		memcpy(in_buffer, &rx_buffer[0], I2S_BUFSZ/2*sizeof(int16_t));
 
 		/* load the 2nd half of the buffer */
 		Audio_Proc(&tx_buffer[I2S_BUFSZ/2], in_buffer, I2S_BUFSZ/2);
+		
+#ifdef USE_CACHE
+		/* flush DCache to destination */
+		cache_addr = (uint32_t *)((uint32_t)&tx_buffer[I2S_BUFSZ/2] & ~0x1f);
+		SCB_CleanDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
 	}
     	
 	/* Lower activity flag */

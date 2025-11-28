@@ -9,9 +9,8 @@
  *
  */
 
-#include "stm32h7rsxx_hal.h"
+#include "main.h"
 #include "usart.h"
-#include "printf.h"
 #include "led.h"
 #include "adc.h"
 
@@ -153,6 +152,14 @@ void SystemClock_Config(void)
  */
 int main(void)
 {
+#ifdef USE_CACHE
+	/* Enable I-Cache */
+	SCB_EnableICache();
+
+	/* Enable D-Cache */
+	SCB_EnableDCache();
+#endif
+	
   /* MPU Configuration--------------------------------------------------------*/
 	MPU_Config();
 	
@@ -204,7 +211,7 @@ int main(void)
 	{
 		LEDToggle();
 		HAL_Delay(100);
-		printf("ADC: %4d, %4d, %4d, %4d\r", ADC_GetChl(0), ADC_GetChl(1), ADC_GetChl(2), ADC_GetChl(3));
+		printf("ADC: %4d, %4d, %4d, %4d\r", ADC_val[0], ADC_val[1], ADC_val[2], ADC_val[3]);
 	}
 	
 	/* should never get here */

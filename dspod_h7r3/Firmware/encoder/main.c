@@ -1,17 +1,20 @@
 /*
- * main.c - dspod_h7r3 blinky test program
- * 10-14-25 E. Brombaugh
+ * main.c - dspod_h7r3 encoder test program
+ * 11-14-25 E. Brombaugh
  ******************************************************************************
  * Changelog
  *
- * date: 2025-10-14 V0.0
+ * date: 2025-11-14 V0.0
  * Initial creation
  *
  */
 
 #include "main.h"
 #include "usart.h"
+#include "cyclesleep.h"
 #include "led.h"
+#include "st7789.h"
+#include "systick.h"
 
 /* build version in simple format */
 const char *fwVersionStr = "V0.0";
@@ -147,6 +150,37 @@ void SystemClock_Config(void)
 }
 
 /*
+ * splash screen
+ */
+void splash(const char *swVersionStr, const char *date, const char *time)
+{
+	GFX_RECT rect;
+	char textbuf[32];
+
+	rect.x0 = 2;
+	rect.y0 = 2;
+	rect.x1 = 317;
+	rect.y1 = 167;
+	gfx_fillroundedrect(&rect, 20);
+	rect.x0 = 40;
+	rect.y0 = 40;
+	rect.x1 = 279;
+	rect.y1 = 130;
+	gfx_set_forecolor(GFX_BLUE);
+	gfx_fillroundedrect(&rect, 20);
+	gfx_set_backcolor(GFX_BLUE);
+	gfx_set_forecolor(GFX_WHITE);
+	gfx_set_txtscale(2);
+	gfx_drawstrctr((rect.x0+rect.x1)/2, (rect.y0+rect.y1)/2-32, "DSPOD");
+	gfx_drawstrctr((rect.x0+rect.x1)/2, (rect.y0+rect.y1)/2-8, "H7R3");
+	gfx_set_txtscale(1);
+	sprintf(textbuf, "Version %s", swVersionStr);
+	gfx_drawstrctr((rect.x0+rect.x1)/2, (rect.y0+rect.y1)/2+16, textbuf);
+	sprintf(textbuf, "%s %s", date, time);
+	gfx_drawstrctr((rect.x0+rect.x1)/2, (rect.y0+rect.y1)/2+32, textbuf);
+}
+
+/*
  * enter here
  */
 int main(void)
@@ -159,8 +193,11 @@ int main(void)
 	SCB_EnableDCache();
 #endif
 	
-  /* MPU Configuration--------------------------------------------------------*/
+	/* MPU Configuration */
 	MPU_Config();
+	
+	/* init encoder & button polling prior to HAL */
+	systick_init();
 	
     /* STM32H7xx HAL library initialization:
        - Systick timer is configured by default as source of time base, but user 
@@ -186,7 +223,7 @@ int main(void)
 	/* init the UART for diagnostics */
 	setup_usart();
 	init_printf(0,usart_putc);
-	printf("\n\n\rdspod_h7r3 blinky\n\r");
+	printf("\n\n\rdspod_h7r3 encoder\n\r");
 	printf("CPUID: 0x%08X\n\r", SCB->CPUID);
 	printf("IDCODE: 0x%08X\n\r", DBGMCU->IDCODE);
 	printf("Version: %s\n\r", fwVersionStr);
@@ -196,27 +233,41 @@ int main(void)
 	printf("SYSCLK = %d\n\r", HAL_RCC_GetSysClockFreq());
 	printf("\n");
 	
+	/* initialize cycle counter */
+	cyccnt_enable();
+	printf("Cycle Counter initialized\n\r");
+	
 	/* initialize LEDs */
 	LEDInit();
 	printf("LED initialized\n\r");
-		
+	
+	/* set up LCD SPI & GPIO */
+	gfx_init(&ST7789_drvr);
+	gfx_clrscreen();
+	splash(fwVersionStr, bdate, btime);
+	ST7789_backlight(1);
+	printf("LCD & GFX initialized\n\r");
+	HAL_Delay(2000);
+	
     /* Infinite loop */
+	gfx_set_backcolor(GFX_WHITE);
+	gfx_set_forecolor(GFX_BLUE);
+	gfx_set_txtscale(2);
+	char textbuf[32];
+	int enc = 0;
 	printf("Looping...\n\r");
 	while(1)
 	{
 		LEDToggle();
+		
+		enc += systick_get_enc();
+		sprintf(textbuf, "%5d %1d %1d", enc,
+			systick_get_button(ENC_E), systick_get_button(TAP));
+		gfx_drawstrctr(160, 145, textbuf);
+		
 		HAL_Delay(100);
 	}
 	
 	/* should never get here */
 	return 0;
-}
-
-/*
- * SysTick IRQ handler runs at 1000Hz
- */
-void SysTick_Handler(void)
-{
-	/* Needed by HAL! */
-	HAL_IncTick();
 }

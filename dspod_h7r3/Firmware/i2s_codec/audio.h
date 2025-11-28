@@ -10,6 +10,7 @@
 
 #define SMPS 128
 #define CHLS 2
+#define BUFSZ (SMPS*CHLS)
 
 void Audio_Init(void);
 void Audio_Proc(int16_t *dst, int16_t *src, uint32_t sz);
