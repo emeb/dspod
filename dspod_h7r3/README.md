@@ -46,7 +46,7 @@ I was interested in trying out the STM32H7R3 primarily due to its clock speed ra
 
 #### Programming
 
-The first hurdle to overcome was how to get code into the device since the H7R/S series parts have new IDs and slightly different programming protocols that weren't yet supported by the various SWD interfaces that I have. Mainline OpenOCD does not yet have target scripts for the H7R/S nor does the Black Magic Probe. After some testing I found a way to use the customized version of OpenOCD included with the [ST CubeIDE]([STM32CubeIDE | Software - STMicroelectronics](https://www.st.com/en/development-tools/stm32cubeide.html)) development tools and somewhat later found that their fork was available separately in a github repository of a [forked OpenOCD]([GitHub - STMicroelectronics/OpenOCD: STMicroelectronics customized version of OpenOCD supporting STM32 MCUs and MPUs](https://github.com/STMicroelectronics/OpenOCD)) provided by ST.
+The first hurdle to overcome was how to get code into the device since the H7R/S series parts have new IDs and slightly different programming protocols that weren't yet supported by the various SWD interfaces that I have. Mainline OpenOCD does not yet have target scripts for the H7R/S nor does the Black Magic Probe. After some testing I found a way to use the customized version of OpenOCD included with the [ST CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) development tools and somewhat later found that their fork was available separately in a github repository of a [forked OpenOCD](https://github.com/STMicroelectronics/OpenOCD) provided by ST.
 
 #### DMA
 
