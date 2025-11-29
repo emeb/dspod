@@ -32,4 +32,4 @@ The hardware design is provided in Kicad 9.x format in the [Hardware](./Hardware
 
 ## Firmware
 
-Firmware is TBD.
+Firmware is TBD but will be derived from prior work on the [S3GTA](https://github.com/emeb/S3GTA) module.
