@@ -301,7 +301,7 @@ void xspi_memmap(uint8_t enable)
  */
 
 //#define xspi_TEST_LEN xspi_SIZE/4
-#define xspi_TEST_LEN (1<<12)
+#define xspi_TEST_LEN (1<<11)
 
 /* PRN generator info */
 #define NOISE_POLY_TAP0 31

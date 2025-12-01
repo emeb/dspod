@@ -11,6 +11,8 @@
 
 #define I2S_BUFSZ BUFSZ
 
+extern DMA_NodeTypeDef Node_GPDMA1_Channel1;
+
 void i2s_init(void);
 void i2s_start(void);
 int32_t i2s_get_fsamp(void);

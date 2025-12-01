@@ -28,11 +28,12 @@
 #endif
 
 /* uncomment to enable IRQ diag on RX pin */
-//#define DIAG
+#define DIAG
 
 #ifdef DIAG
-#define DIAG_LOW()	(GPIOB->BSRR=(GPIO_PIN_7<<16))
-#define DIAG_HIGH()	(GPIOB->BSRR=GPIO_PIN_7)
+/* diag on dspod gate-out */
+#define DIAG_LOW()	(GPIOA->BSRR=(GPIO_PIN_0<<16))
+#define DIAG_HIGH()	(GPIOA->BSRR=GPIO_PIN_0)
 #else
 #define DIAG_LOW()
 #define DIAG_HIGH()
@@ -43,15 +44,15 @@ I2S_HandleTypeDef hi2s6;
 
 /* structures used by linked-list mode which is essential for circular DMA */
 DMA_NodeTypeDef Node_GPDMA1_Channel1 __attribute__ ((section (".sramahb_data")));
-DMA_QListTypeDef List_GPDMA1_Channel1 ;//__attribute__ ((section (".sramahb_data")));
-DMA_HandleTypeDef handle_GPDMA1_Channel1 ;//__attribute__ ((section (".sramahb_data")));
+DMA_QListTypeDef List_GPDMA1_Channel1;
+DMA_HandleTypeDef handle_GPDMA1_Channel1;
 DMA_NodeTypeDef Node_GPDMA1_Channel0 __attribute__ ((section (".sramahb_data")));
-DMA_QListTypeDef List_GPDMA1_Channel0 ;//__attribute__ ((section (".sramahb_data")));
-DMA_HandleTypeDef handle_GPDMA1_Channel0 ;//__attribute__ ((section (".sramahb_data")));
+DMA_QListTypeDef List_GPDMA1_Channel0;
+DMA_HandleTypeDef handle_GPDMA1_Channel0;
 
 /* DMA buffers */
-int16_t tx_buffer[I2S_BUFSZ] __attribute__ ((aligned (8))) __attribute__ ((section (".sramahb_data"))),
-		rx_buffer[I2S_BUFSZ] __attribute__ ((aligned (8))) __attribute__ ((section (".sramahb_data"))),
+int16_t tx_buffer[I2S_BUFSZ] __attribute__ ((aligned (32))) __attribute__ ((section (".sramahb_data"))),
+		rx_buffer[I2S_BUFSZ] __attribute__ ((aligned (32))) __attribute__ ((section (".sramahb_data"))),
 		in_buffer[I2S_BUFSZ/2];
 
 /**
@@ -109,12 +110,12 @@ void i2s_init(void)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 #ifdef DIAG
-	/* Configure diagnostic output pin on PB7 ------------------------*/
-	GPIO_InitStruct.Pin =  GPIO_PIN_7;
+	/* Configure diagnostic output pin on PA0 (gate-out) --------------------*/
+	GPIO_InitStruct.Pin =  GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 	
     /* SPI6/I2S6 Init */
@@ -217,9 +218,11 @@ void i2s_init(void)
     }
 	
 #ifdef USE_CACHE
+#ifndef USE_MPU
 	/* flush linked list? */
 	uint32_t *clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel0 & ~0x1f);
 	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef)+0x20);
+#endif
 #endif
 	
 	/* GPDMA1_REQUEST_SPI1_RX Init */
@@ -274,7 +277,6 @@ void i2s_init(void)
     {
       Error_Handler();
     }
-
     if (HAL_DMAEx_List_LinkQ(&handle_GPDMA1_Channel1, &List_GPDMA1_Channel1) != HAL_OK)
     {
       Error_Handler();
@@ -286,11 +288,13 @@ void i2s_init(void)
     }
 	
 #ifdef USE_CACHE
+#ifndef USE_MPU
 	/* flush linked list? */
 	clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel1 & ~0x1f);
 	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef));
 #endif
-	
+#endif
+
 	/* start up DMA */	
 	uint32_t cllr_mask = DMA_CLLR_UT1 | DMA_CLLR_UT2 | DMA_CLLR_UB1 | DMA_CLLR_USA | DMA_CLLR_UDA | DMA_CLLR_ULL;
 	handle_GPDMA1_Channel0.Instance->CLBAR = ((uint32_t)handle_GPDMA1_Channel0.LinkedListQueue->Head & DMA_CLBAR_LBA);
@@ -347,8 +351,6 @@ int32_t i2s_get_fsamp(void)
   */
 void DMA_TX_CHL_IRQHandler(void)
 {
-	uint32_t *cache_addr;
-	
 	/* Raise activity flag */
 	DIAG_HIGH();
 
@@ -359,9 +361,11 @@ void DMA_TX_CHL_IRQHandler(void)
 		DMA_TX_CHL->CFCR = DMA_CFCR_HTF;
 		
 #ifdef USE_CACHE
+#ifndef USE_MPU
 		/* invalidate cache on RX DMA */
-		cache_addr = (uint32_t *)((uint32_t)&rx_buffer[I2S_BUFSZ/2] & ~0x1f);
+		uint32_t *cache_addr = (uint32_t *)((uint32_t)&rx_buffer[I2S_BUFSZ/2] & ~0x1f);
 		SCB_InvalidateDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
 #endif
 
 		/* grab rx from previous */
@@ -371,9 +375,11 @@ void DMA_TX_CHL_IRQHandler(void)
 		Audio_Proc(&tx_buffer[0], in_buffer, I2S_BUFSZ/2);
 		
 #ifdef USE_CACHE
+#ifndef USE_MPU
 		/* flush DCache to destination */
 		cache_addr = (uint32_t *)((uint32_t)&tx_buffer[0] & ~0x1f);
 		SCB_CleanDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
 #endif
 	}
 	
@@ -384,9 +390,11 @@ void DMA_TX_CHL_IRQHandler(void)
 		DMA_TX_CHL->CFCR = DMA_CFCR_TCF;
 		
 #ifdef USE_CACHE
+#ifndef USE_MPU
 		/* invalidate cache on RX DMA */
-		cache_addr = (uint32_t *)((uint32_t)&rx_buffer[0] & ~0x1f);
+		uint32_t *cache_addr = (uint32_t *)((uint32_t)&rx_buffer[0] & ~0x1f);
 		SCB_InvalidateDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
 #endif
 
 		/* grab rx from previous */
@@ -396,9 +404,11 @@ void DMA_TX_CHL_IRQHandler(void)
 		Audio_Proc(&tx_buffer[I2S_BUFSZ/2], in_buffer, I2S_BUFSZ/2);
 		
 #ifdef USE_CACHE
+#ifndef USE_MPU
 		/* flush DCache to destination */
 		cache_addr = (uint32_t *)((uint32_t)&tx_buffer[I2S_BUFSZ/2] & ~0x1f);
 		SCB_CleanDCache_by_Addr(cache_addr, 4 * I2S_BUFSZ/2*sizeof(int16_t));
+#endif
 #endif
 	}
     	

@@ -5,11 +5,18 @@
 VPATH = .:../common:../CMSIS:../HAL
 
 # Object files
-OBJECTS = 	startup_stm32h7r3xx.o system_stm32h7rsxx.o main.o led.o usart.o printf.o \
+OBJECTS = 	startup_stm32h7r3xx.o system_stm32h7rsxx.o main.o led.o usart.o \
+			printf.o systick.o cyclesleep.o audio.o i2s.o shared_i2c.o codec.o \
+			debounce.o shared_spi.o st7789.o gfx.o font_8x8.o adc.o dsp_lib.o \
+			menu.o widgets.o fx.o fx_vca.o fx_filters.o ifilter_mg4_v1.o \
+			fx_cdl.o xspi.o fx_cdl_ext.o psram_buff.o \
 			stm32h7rsxx_hal.o stm32h7rsxx_hal_cortex.o stm32h7rsxx_hal_gpio.o \
-            stm32h7rsxx_hal_rcc.o stm32h7rsxx_hal_rcc_ex.o stm32h7rsxx_hal_pwr_ex.o \
-            stm32h7rsxx_hal_usart.o \
-
+            stm32h7rsxx_hal_rcc.o stm32h7rsxx_hal_rcc_ex.o stm32h7rsxx_ll_rcc.o \
+			stm32h7rsxx_hal_pwr_ex.o stm32h7rsxx_hal_usart.o stm32h7rsxx_hal_i2s.o \
+			stm32h7rsxx_hal_dma.o stm32h7rsxx_hal_dma_ex.o stm32h7rsxx_hal_i2c.o \
+			stm32h7rsxx_hal_i2c_ex.o stm32h7rsxx_hal_spi.o stm32h7rsxx_hal_adc.o \
+			stm32h7rsxx_hal_adc_ex.o stm32h7rsxx_hal_xspi.o
+			
 # Linker script
 LDSCRIPT = stm32h7r3xx_flash.ld
 
@@ -17,9 +24,9 @@ LDSCRIPT = stm32h7r3xx_flash.ld
 DEPDIR = dep
 
 # Compiler Flags
-CFLAGS  = -g -O3 -ffunction-sections -std=gnu99 -Wall -flto
+CFLAGS  = -g -O3 -ffunction-sections -std=gnu99 -Wall -flto=auto
 CFLAGS += -I. -I../common -I../CMSIS -I../HAL -I../DSP -I../shimmer
-CFLAGS += -DARM_MATH_CM7 -DUSE_HAL_DRIVER
+CFLAGS += -DARM_MATH_CM7 -DUSE_HAL_DRIVER -DUSE_FULL_LL_DRIVER
 CFLAGS += -D'HSE_VALUE=((uint32_t)12000000)' -DSTM32H7R3xx
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m7 
 CFLAGS += -mfloat-abi=hard -mfpu=fpv5-sp-d16
@@ -44,14 +51,27 @@ AS = $(ARCH)-as
 OBJCPY = $(ARCH)-objcopy
 OBJDMP = $(ARCH)-objdump
 GDB = $(ARCH)-gdb
+
+## Mainline OpenOCD installed in /usr/local (doesn't work w/ H7R3 atm)
 #OPENOCD = openocd
-OPENOCD = /home/ericb/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.linux64_2.4.200.202505051030/tools/bin/openocd
+
+## ST's fork of OpenOCD from https://github.com/STMicroelectronics/OpenOCD
+## branch openocd-cubeide-r6
+## need to export OPENOCD_SCRIPTS=/home/ericb/build/openocd/stm32oocd/OpenOCD/tcl/
+## before using
+OPENOCD = ~/build/openocd/stm32oocd/OpenOCD/src/openocd
+
+## OOCD from STM32CubeIDE - need to
+## export OPENOCD_SCRIPTS=/home/ericb/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.100.202501240831/resources/openocd/st_scripts
+## before using
+#OPENOCD = /home/ericb/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.linux64_2.4.200.202505051030/tools/bin/openocd
+
 CRYPT = ../crc_calc/crc_calc
 DFU = dfu-util
 DFU_SUFFIX = dfu-suffix
 
 CPFLAGS = --output-target=binary
-ODFLAGS	= -x --syms
+ODFLAGS	= -x --syms -g
 
 # Targets
 all: main.bin

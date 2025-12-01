@@ -10,6 +10,8 @@ This directory contains various makefile-based projects for testing out the dspo
 
 - psram - testing out the 8MB PSRAM attached to the XSPI port.
 
+- app - a multi-effects application with a number of simple gain, filter and delay algorithms.
+
 ## Prerequisites
 
 You'll need to have installed a working Arm GCC toolchain in order to use these projects, as well as a version of OpenOCD or Black Magic Probe that supports the STM32H7R3 for loading code into flash. The Makefiles in each project directory will have to be edited to point to these tools.
@@ -20,7 +22,17 @@ I use the Arm GCC toolchain from this site: https://developer.arm.com/Tools%20an
 
 ### OpenOCD
 
-OpenOCD is the tool used to communicate with SWD port on the STM32H7R3 MCU in order to load binary code into the on-chip flash memory. The mainline tool is fairly slow to change and can take several years to add support for new devices, so the STM32H7R3 is not yet in the database for mainline. ST however provides a forked version of OpenOCD that quickly adds their own products and is available with the installation of their proprietary [STM32CubeIDE | Software - STMicroelectronics](https://www.st.com/en/development-tools/stm32cubeide.html) 
+OpenOCD is the tool used to communicate with SWD port on the STM32H7R3 MCU in order to load binary code into the on-chip flash memory. The mainline tool is fairly slow to change and can take several years to add support for new devices, so the STM32H7R3 is not yet in the database for mainline. ST however provides a forked version of OpenOCD that quickly adds their own products and is available in sevral ways:
+
+- Directly from their GitHub repository: [GitHub - STMicroelectronics/OpenOCD: STMicroelectronics customized version of OpenOCD supporting STM32 MCUs and MPUs](https://github.com/STMicroelectronics/OpenOCD)
+
+- With the installation of their proprietary [STM32CubeIDE | Software - STMicroelectronics](https://www.st.com/en/development-tools/stm32cubeide.html) 
+
+#### Github
+
+This is the version my Makefiles are set up for - it works but requires building from scratch. Clone the repository and make sure to select the `openocd-cubeide-r6` branch, then follow the installation instructions included. I found that when running the `configure` script that I had to include the following option to compile successfully: `--disable-werror`
+
+#### CubeIDE
 
 I was able to use this version to successfully program the STM32H7R3 but it does require some fiddling to discover the location of the executable binary and provide it with the location of the necessary scripts
 

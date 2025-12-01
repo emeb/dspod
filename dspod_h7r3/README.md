@@ -46,15 +46,19 @@ I was interested in trying out the STM32H7R3 primarily due to its clock speed ra
 
 #### Programming
 
-The first hurdle to overcome was how to get code into the device since the H7R/S series parts have new IDs and slightly different programming protocols that weren't yet supported by the various SWD interfaces that I have. Mainline OpenOCD does not yet have target scripts for the H7R/S nor does the Black Magic Probe. After some testing I found a way to use the customized version of OpenOCD included with the [ST CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) development tools and somewhat later found that their fork was available separately in a github repository of a [forked OpenOCD](https://github.com/STMicroelectronics/OpenOCD) provided by ST.
+The first hurdle to overcome was how to get code into the device since the H7R/S series parts have new IDs and slightly different programming protocols that weren't yet supported by the various SWD interfaces that I have. Mainline OpenOCD does not yet have target scripts for the H7R/S nor does the Black Magic Probe. After some testing I was able use a forked version of OpenOCD provided by ST - more detail on setting this up is in the README file of the Firmware directory.
 
 #### DMA
 
 Previous projects I'd done with STM32H7 devices had used the "old style" DMA subsystem that hadn't really changed much since the days of the STM32F1xx. The H7R3 however has a new GPDMA subsystem that requires a rather different configuration and presents a few hurdles when combined with caching. In particular, GPDMA requires linked-lists of descriptors in SRAM to control its operation and these require careful handling when cache is enabled.
 
+#### Cache and MPU
+
+The Cortex M7 include cache and memory protection which should work together to optimize memory accesses. I have compile time switches in my firmware source to try various combinations of these features and have found that while using them is generally reliable and leads to significant improvements in execution speed, some combinations can result in faults that hang the system. The causes are sometimes hard to discover and can change as seemingly unrelated parts of the firmware are modified. More work is needed to fully understand this.
+
 #### XSPI
 
-This project includes options for several different types of quad-width external serial memories. Earlier projects have successfully explored the use of QSPI PSRAMs for buffering audio data but these used "indirect mode" where the external device is treate as a SPI device where reading and writing require the CPU to manage the bus transactions through the HAL API. The H7R3 has a new "XSPI" port that allows the address space of the external device to be mapped into the CPU's memory space, allowing reading and writing without specifically managing the bust transactions. Although some example code for this is available, it's not tailored for the specific devices that I'm using and I've not been able to get it memory mapped mode working reliably in my hardware so I've fallen back to using indirect accesses.
+This project includes options for several different types of quad-width external serial memories. Earlier projects have successfully explored the use of QSPI PSRAMs for buffering audio data but these used "indirect mode" where the external device is treate as a SPI device where reading and writing require the CPU to manage the bus transactions through the HAL API. The H7R3 has a new "XSPI" port that allows the address space of the external device to be mapped into the CPU's memory space, allowing reading and writing without specifically managing the bust transactions. Although some example code for this is available, it's not tailored for the specific devices that I'm using and I've not been able to get it memory mapped mode working reliably in my hardware so I've fallen back to using indirect accesses. There are examples of both of these methods available in the Firmware/app directory.
 
 #### Flash
 
@@ -84,8 +88,8 @@ There are a number of subtle details in the operation of the H7R3 that may not b
 
 Remaining tasks:
 
-- Resolve GPDMA + cache issues - currently there seems to be a conflict between the GPDMA setup for the ADC and I2S peripherals and the data cache.
-
 - Add QSPI flash chip enabled by NCS2 pin (soldered piggyback on the existing SOIC-8 PSRAM device) and figure out all the details needed to prepare and program code into it.
 
 - Test out the HS USB interface.
+
+- Test out FFT-based "spectral" effects algorithms.

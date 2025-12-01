@@ -11,19 +11,20 @@
 //#define DIAG
 
 #ifdef DIAG
-#define DIAG_LOW()	(GPIOB->BSRR=(GPIO_PIN_7<<16))
-#define DIAG_HIGH()	(GPIOB->BSRR=GPIO_PIN_7)
+/* diag on dspod gate-out */
+#define DIAG_LOW()	(GPIOA->BSRR=(GPIO_PIN_0<<16))
+#define DIAG_HIGH()	(GPIOA->BSRR=GPIO_PIN_0)
 #else
 #define DIAG_LOW()
 #define DIAG_HIGH()
 #endif
 
 ADC_HandleTypeDef hadc1 ;//__attribute__ ((section (".ram_data")));
-DMA_NodeTypeDef Node_GPDMA1_Channel2 __attribute__ ((section (".sramahb_data")));
+DMA_NodeTypeDef Node_GPDMA1_Channel2 __attribute__ ((section (".sramahb_data"))) ;//__attribute__ ((aligned (32)));
 DMA_QListTypeDef List_GPDMA1_Channel2 ;//__attribute__ ((section (".sramahb_data")));
 DMA_HandleTypeDef handle_GPDMA1_Channel2 ;//__attribute__ ((section (".sramahb_data")));
 
-int16_t adc_buffer[ADC_BUFSZ] __attribute__ ((section (".sramahb_data")));
+int16_t adc_buffer[ADC_BUFSZ] __attribute__ ((section (".sramahb_data"))) ;//__attribute__ ((aligned (32)));
 volatile int16_t ADC_val[ADC_BUFSZ];
 
 /**
@@ -78,16 +79,17 @@ void ADC_Init(void)
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
 #ifdef DIAG
-	/* Configure diagnostic output pin on PB7 ------------------------*/
-	GPIO_InitStruct.Pin =  GPIO_PIN_7;
+	/* Configure diagnostic output pin on PA0 (gate-out) --------------------*/
+	GPIO_InitStruct.Pin =  GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 	
 	/*
 	* Common config
+	* clocking, oversampling and sample time combine for ~4kHz ISR rate
 	*/
 	hadc1.Instance = ADC1;
 	hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
@@ -104,7 +106,12 @@ void ADC_Init(void)
 	hadc1.Init.SamplingMode = ADC_SAMPLING_MODE_NORMAL;
 	hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR;
 	hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-	hadc1.Init.OversamplingMode = DISABLE;
+	hadc1.Init.OversamplingMode = ENABLE;
+	hadc1.Init.Oversampling.Ratio = ADC_OVERSAMPLING_RATIO_16;
+	hadc1.Init.Oversampling.RightBitShift = ADC_RIGHTBITSHIFT_4;
+	hadc1.Init.Oversampling.TriggeredMode = ADC_TRIGGEREDMODE_SINGLE_TRIGGER;
+	hadc1.Init.Oversampling.OversamplingStopReset = ADC_REGOVERSAMPLING_CONTINUED_MODE;
+	
 	if (HAL_ADC_Init(&hadc1) != HAL_OK)
 	{
 		Error_Handler();
@@ -122,7 +129,7 @@ void ADC_Init(void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_1;
 	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	sConfig.SamplingTime = ADC_SAMPLETIME_247CYCLES_5;
 	sConfig.SingleDiff = ADC_SINGLE_ENDED;
 	sConfig.OffsetNumber = ADC_OFFSET_NONE;
 	sConfig.Offset = 0;
@@ -206,6 +213,14 @@ void ADC_Init(void)
       Error_Handler();
     }
 	
+#ifdef USE_CACHE
+#ifndef USE_MPU
+	/* flush linked list? */
+	uint32_t *clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel2 & ~0x1f);
+	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef)+0x20);
+#endif
+#endif
+	
 	handle_GPDMA1_Channel2.Instance = GPDMA1_Channel2;
 	handle_GPDMA1_Channel2.InitLinkedList.Priority = DMA_LOW_PRIORITY_LOW_WEIGHT;
 	handle_GPDMA1_Channel2.InitLinkedList.LinkStepMode = DMA_LSM_FULL_EXECUTION;
@@ -227,12 +242,6 @@ void ADC_Init(void)
 		Error_Handler();
 	}
 	
-#ifdef USE_CACHE
-	/* flush linked list? */
-	uint32_t *clean_addr = (uint32_t *)((uint32_t)&Node_GPDMA1_Channel2 & ~0x1f);
-	SCB_CleanDCache_by_Addr(clean_addr, sizeof(DMA_NodeTypeDef)+0x20);
-#endif
-
 	/* Point DMA chl at the linked list */
 	uint32_t cllr_mask = DMA_CLLR_UT1 | DMA_CLLR_UT2 | DMA_CLLR_UB1 | DMA_CLLR_USA | DMA_CLLR_UDA | DMA_CLLR_ULL;
 	handle_GPDMA1_Channel2.Instance->CLBAR = ((uint32_t)handle_GPDMA1_Channel2.LinkedListQueue->Head & DMA_CLBAR_LBA);
@@ -275,9 +284,11 @@ void GPDMA1_Channel2_IRQHandler(void)
 		GPDMA1_Channel2->CFCR = DMA_CFCR_TCF;
 		
 #ifdef USE_CACHE
+#ifndef USE_MPU
 		/* invalidate Dcache of ADC buffer */
 		uint32_t *inval_addr = (uint32_t *)((uint32_t)adc_buffer & ~0x1f);
 		SCB_InvalidateDCache_by_Addr(inval_addr, ADC_BUFSZ+32);
+#endif
 #endif
 		
 		/* grab rx from previous, invert, etc */
