@@ -86,6 +86,10 @@ There are a number of subtle details in the operation of the H7R3 that may not b
 
 - There are a number of on-chip voltage regulators and power management features that depend on the package type. In the LQFP100 that is used on the dspod-h7r3 most of these are not available due to pin limitations but default settings in the PWR registers aren't quite right for that package. In particular one of the voltage regulator settings must be changed in order to run the device at its maximum 600MHz clock rate.
 
+#### DSP Performance
+
+Running the same algorithms as used on the the other platforms (CV1800B, RP2350) the STM32H7R3 significantly outperforms them. In particular the spectral phase vocoder effect uses only 35% of CPU on the H7R3 (600MHz, ARM Cortex M7, bare metal) compared to over 50% on the CV1800B (1GHz RISC-V linux). 
+
 ## TBD
 
 Remaining tasks:
