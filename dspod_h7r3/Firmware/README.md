@@ -4,13 +4,17 @@ This directory contains various makefile-based projects for testing out the dspo
 
 - blinky - the traditional blinking LED for initial proof-of-life after assembly.
 
+- blinky_uf2 - the blinking LED demo but designed to be flashed into external QSPI flash memory with the Adafruit TinyUF2 bootloader (see below).
+
 - adc - testing out the 4-channel ADC inputs.
 
 - i2s_codec - testing out the I2S I/O channel, I2C control and the NAU88C22 codec.
 
-- psram - testing out the 8MB PSRAM attached to the XSPI port.
+- psram - testing out the 8MB PSRAM attached to the XSPI port with the first chip select.
 
 - app - a multi-effects application with a number of simple gain, filter and delay algorithms.
+
+- flash - a test of external QSPI flash memory attached to the XSPI port with the second chip select.
 
 ## Prerequisites
 
@@ -41,6 +45,22 @@ I was able to use this version to successfully program the STM32H7R3 but it does
 - Find the executable binary and add the path to the project Makefile. I found mine at`~/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.linux64_2.4.200.202505051030/tools/bin/openocd`
 
 - Make sure to set the environment variable that OpenOCD needs to find its scripts. Mine was at `export OPENOCD_SCRIPTS=~/st/stm32cubeide_1.19.0/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.100.202501240831/resources/openocd/st_scripts`
+
+#### TinyUF2
+
+The TinyUF2 bootloader allows executable firmware to be programmed into external QSPI flash memory via an easy-to-use USB mass storage interface. Although the mainline version of TinyUF2 doesn't support the dspod H7R3 board, I've got a fork which does - find it here: [GitHub - emeb/tinyuf2](https://github.com/emeb/tinyuf2)
+
+To use it, follow these steps:
+
+- clone the repository
+
+- switch to the `stm32h7rs` branch
+
+- `cd ports/stm32h7rs`
+
+- `make BOARD=dspod_h7r3 all`
+
+- flash to the board with your favorite tool.
 
 ## Building
 

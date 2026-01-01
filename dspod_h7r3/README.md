@@ -62,7 +62,7 @@ This project includes options for several different types of quad-width external
 
 #### Flash
 
-The H7R3 is intended for systems that employ external flash connected via the XSPI port and consequently it has only 64kB of on-chip flash memory which is intended for only small applications, or as a bootloader for code stored off-chip which is either loaded into on-chip SRAM or "execute in-place" (XIP) via the memory-mapped mode of the XSPI port.
+The H7R3 is intended for systems that employ external flash connected via the XSPI port and consequently it has only 64kB of on-chip flash memory which is intended for only small applications, or as a bootloader for code stored off-chip which is either loaded into on-chip SRAM or "execute in-place" (XIP) via the memory-mapped mode of the XSPI port. External QSPI flash and XIP operation has been verified.
 
 For small applications that fit into the on-chip flash it's not necessary to deal with XSPI or the linker and programming complications that result so development is fairly simple. The downside of course is that one is limited to just 64kB of code. 
 
@@ -73,6 +73,8 @@ For larger applications there are a number of barriers to overcome:
 - Creating a bootloader that sets up the XSPI peripheral and vectors execution to the code stored in external memory.
 
 - Configuring the programming tool to allow reading and writing of the external memory with the binary output of the build tools. This will be unique to every project.
+
+Programming and booting are nicely handled using the TinyUF2 bootloader, specifically targeted at the dspod_h7r3. It handles programming the external flash memory via a user-friendly drag & drop USB mass storage interface and jumps directly to the user application in the external memory when it's available. Read more about this in the Firmware section.
 
 #### Quirks
 
@@ -88,8 +90,6 @@ There are a number of subtle details in the operation of the H7R3 that may not b
 
 Remaining tasks:
 
-- Add QSPI flash chip enabled by NCS2 pin (soldered piggyback on the existing SOIC-8 PSRAM device) and figure out all the details needed to prepare and program code into it.
-
 - Test out the HS USB interface.
 
-- Test out FFT-based "spectral" effects algorithms.
+- Test out large & complex applications executing out of external flash.
