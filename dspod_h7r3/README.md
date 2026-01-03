@@ -74,7 +74,11 @@ For larger applications there are a number of barriers to overcome:
 
 - Configuring the programming tool to allow reading and writing of the external memory with the binary output of the build tools. This will be unique to every project.
 
-Programming and booting are nicely handled using the TinyUF2 bootloader, specifically targeted at the dspod_h7r3. It handles programming the external flash memory via a user-friendly drag & drop USB mass storage interface and jumps directly to the user application in the external memory when it's available. Read more about this in the Firmware section.
+Programming and booting are nicely handled using the [TinyUF2](https://github.com/adafruit/tinyuf2) bootloader, specifically targeted at the dspod_h7r3. It handles programming the external flash memory via a user-friendly drag & drop USB mass storage interface and jumps directly to the user application in the external memory when it's available. Read more about this in the Firmware section.
+
+#### USB
+
+[TinyUSB](https://docs.tinyusb.org/en/latest/index.html) has support for STM32H7RS family parts in its latest releases so it wasn't too hard to get some of the example code up and running. I forked it and added a BSP for the dspod_h7r3, starting with the full-speed port. Note that although there are both full-speed and high-speed ports and TinyUSB can drive both, the out-of-box configuration was set up to assume high-speed only for the STM32H7RS family and a minor modification to the main source was needed to allow the BSP to select which was used. My fork is available here: [GitHub - emeb/tinyusb](https://github.com/emeb/tinyusb) - be sure to use the `dspod_h7r3` branch. Note that I haven't tested the high-speed port yet but that's on the agenda.
 
 #### Quirks
 
