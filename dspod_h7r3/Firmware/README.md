@@ -62,6 +62,8 @@ To use it, follow these steps:
 
 - flash to the board with your favorite tool.
 
+Note that there are two `BOARD` targets - one for full speed USB and another for high-speed. There's no appreciable difference in flashing speed between them since the flash erase & write timing dominates the process, but if your main application requires one or the other then the UF2 bootloader will support either. 
+
 ## Building
 
 The following steps should be sufficient to build each project:
