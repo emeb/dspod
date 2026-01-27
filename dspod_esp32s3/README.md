@@ -1,6 +1,6 @@
-# dspod_rp2350
+# dspod_esp32s3
 
-![dspod_cv1800b daughterboard](./doc/dspod_esp32s3.png)
+![dspod_esp32s3 daughterboard](./doc/dspod_esp32s3.png)
 
 The dspod_esp32s3 is a daughterboard comprising an ESP32 S3 MCU with 4MB Flash, 2MB PSRAM, USB and GPIO + audio I/O.
 
