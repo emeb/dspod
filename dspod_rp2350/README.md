@@ -1,6 +1,6 @@
 # dspod_rp2350
 
-![dspod_cv1800b daughterboard](./doc/dspod_rp2350.jpg)
+![dspod_rp2350 daughterboard](./doc/dspod_rp2350.jpg)
 
 The dspod_rp2350 is a daughterboard comprising an RP2350A MCU with 4MB Flash, 8MB PSRAM, USB and GPIO + audio I/O.
 
