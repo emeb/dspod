@@ -45,7 +45,7 @@ void psbuf_writebytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 	if((addr != pbf->next_addr) && (pbf->fill_cnt != 0))
 	{
 		/* non-contiguous address with data already waiting */
-		xspi_writebytes(pbf->psram_start + pbf->begin_addr, pbf->buf,
+		xspi_psram_writebytes(pbf->psram_start + pbf->begin_addr, pbf->buf,
 			pbf->fill_cnt);
 		pbf->fill_cnt = 0;
 		pbf->next_addr = addr;
@@ -75,7 +75,7 @@ void psbuf_writebytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 			if((psram_addr + pbf->fill_cnt) < (pbf->psram_start + pbf->psram_sz))
 			{
 				/* write w/o wrap */
-				xspi_writebytes(psram_addr, pbf->buf, pbf->fill_cnt);
+				xspi_psram_writebytes(psram_addr, pbf->buf, pbf->fill_cnt);
 				
 				/* reset fill count - address will update at next iteration */
 				pbf->fill_cnt = 0;
@@ -84,7 +84,7 @@ void psbuf_writebytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 			{
 				/* write only to end of psram */
 				uint32_t tlen = pbf->psram_sz - psram_addr;
-				xspi_writebytes(psram_addr, pbf->buf, tlen);
+				xspi_psram_writebytes(psram_addr, pbf->buf, tlen);
 				
 				/* adjust tracking */
 				pbf->begin_addr += tlen;
@@ -121,7 +121,7 @@ void psbuf_readbytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 		if((psram_addr+pbf->bufsz) < (pbf->psram_start + pbf->psram_sz))
 		{
 			/* no wrap */
-			xspi_readbytes(psram_addr, pbf->buf, pbf->bufsz);
+			xspi_psram_readbytes(psram_addr, pbf->buf, pbf->bufsz);
 			pbf->fill_cnt = pbf->bufsz;
 			pbf->begin_addr += pbf->bufsz;
 		}
@@ -129,7 +129,7 @@ void psbuf_readbytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 		{
 			/* read only to end of psram */
 			uint32_t tlen = pbf->psram_sz - psram_addr;
-			xspi_readbytes(psram_addr, pbf->buf, tlen);
+			xspi_psram_readbytes(psram_addr, pbf->buf, tlen);
 			pbf->fill_cnt = tlen;
 			pbf->begin_addr += tlen;
 		}
@@ -158,7 +158,7 @@ void psbuf_readbytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 			if((psram_addr+pbf->bufsz) < (pbf->psram_start + pbf->psram_sz))
 			{
 				/* no wrap */
-				xspi_readbytes(psram_addr, pbf->buf, pbf->bufsz);
+				xspi_psram_readbytes(psram_addr, pbf->buf, pbf->bufsz);
 				pbf->fill_cnt = pbf->bufsz;
 				pbf->begin_addr += pbf->bufsz;
 			}
@@ -166,7 +166,7 @@ void psbuf_readbytes(psbuf_struct *pbf, uint32_t addr, uint8_t *data,
 			{
 				/* read only to end of psram */
 				uint32_t tlen = pbf->psram_sz - psram_addr;
-				xspi_readbytes(psram_addr, pbf->buf, tlen);
+				xspi_psram_readbytes(psram_addr, pbf->buf, tlen);
 				pbf->fill_cnt = tlen;
 				pbf->begin_addr += tlen;
 			}

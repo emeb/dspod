@@ -14,21 +14,26 @@ This board is a small 32-pin device with the following features:
   - 620kB SRAM
   - 64kB Flash
   - USB, I2C, SPI, ADC, GPIO, etc on-chip
-* USB-C connector, high-speed or full-speed host/device
+* USB-C connector, high-speed or full-speed host/device and power
 * SOIC-8 flash or PSRAM (or both!)
 * Nuvoton NAU88C22 stereo codec
 * Activity LED
 * 3.3V level serial for debug / status
 * SWD for flashing / debug
-* Misc GPIO
+* IO routed to 0.1inch headers:
   - SPI
   - I2C
   - GPIO
+  - Analog
+  - Audio
+  - Power
 * Four channels of 3.3V multiplexed A/D input
+* Stereo line-level audio I/O
+* Pushbuttons for Reset and Boot mode.
 
 This board is test to see how well this new, faster version of the STM32H7 performs - with a clock speed of 600MHz max and plenty of on-chip SRAM it may work well for 'bare-metal' audio DSP. The downside is that it has very limited flash memory which will put a squeeze on the amount of code that can run on-chip. To compensate, a single channel of QSPI to an external device is provided which can host either a large flash memory (up to 128MB is available in this package) or an 8MB PSRAM which can be used for audio buffering. An optional chip select is brought out for experiments with stacking both flash and PSRAM - more on this after hardware is on the bench.
 
-* ## Design Materials
+## Design Materials
 
 * [Schematic](./doc/dspod_h7r3_sch.pdf)
 
@@ -62,7 +67,7 @@ This project includes options for several different types of quad-width external
 
 #### Flash
 
-The H7R3 is intended for systems that employ external flash connected via the XSPI port and consequently it has only 64kB of on-chip flash memory which is intended for only small applications, or as a bootloader for code stored off-chip which is either loaded into on-chip SRAM or "execute in-place" (XIP) via the memory-mapped mode of the XSPI port.
+The H7R3 is intended for systems that employ external flash connected via the XSPI port and consequently it has only 64kB of on-chip flash memory which is intended for only small applications, or as a bootloader for code stored off-chip which is either loaded into on-chip SRAM or "execute in-place" (XIP) via the memory-mapped mode of the XSPI port. External QSPI flash and XIP operation has been verified.
 
 For small applications that fit into the on-chip flash it's not necessary to deal with XSPI or the linker and programming complications that result so development is fairly simple. The downside of course is that one is limited to just 64kB of code. 
 
@@ -73,6 +78,12 @@ For larger applications there are a number of barriers to overcome:
 - Creating a bootloader that sets up the XSPI peripheral and vectors execution to the code stored in external memory.
 
 - Configuring the programming tool to allow reading and writing of the external memory with the binary output of the build tools. This will be unique to every project.
+
+Programming and booting are nicely handled using the [TinyUF2](https://github.com/adafruit/tinyuf2) bootloader, specifically targeted at the dspod_h7r3. It handles programming the external flash memory via a user-friendly drag & drop USB mass storage interface and jumps directly to the user application in the external memory when it's available. I've got this working reliably in both USB full-speed and high-speed modes and even have it reasonably well integrated into my development flow for hands-off flashing. Read more about this in the Firmware section.
+
+#### USB
+
+[TinyUSB](https://docs.tinyusb.org/en/latest/index.html) has support for STM32H7RS family parts in its latest releases so it wasn't too hard to get some of the example code up and running. I forked it and added BSPs for the dspod_h7r3 in both full and high-speed modes. Note that although TinyUSB can drive both, the out-of-box configuration was set up to assume high-speed only for the STM32H7RS family and a minor modification to the main source was needed to allow the BSP to select which was used. My fork is available here: [GitHub - emeb/tinyusb](https://github.com/emeb/tinyusb) - be sure to use the `dspod_h7r3` branch. I've got board-support targets for both the full-speed port `BOARD=dspod_h7r3` and the high-speed port `BOARD=dspod_h7r3_hs` and they both work just fine.
 
 #### Quirks
 
@@ -90,10 +101,4 @@ Running the same algorithms as used on the the other platforms (CV1800B, RP2350)
 
 ## TBD
 
-Remaining tasks:
-
-- Add QSPI flash chip enabled by NCS2 pin (soldered piggyback on the existing SOIC-8 PSRAM device) and figure out all the details needed to prepare and program code into it.
-
-- Test out the HS USB interface.
-
-- Test out FFT-based "spectral" effects algorithms.
+At this point I've exercised all of the fundamental features that I wanted to try so the only remaining project is a fully-featured audio effects application with time and frequency domain algorithms and other essential features like tap tempo, setting storage, etc. That's a job for future me.
