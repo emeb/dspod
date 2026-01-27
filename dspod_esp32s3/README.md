@@ -8,11 +8,13 @@ The dspod_esp32s3 is a daughterboard comprising an ESP32 S3 MCU with 4MB Flash, 
 
 This board is a small 32-pin device with the following features:
 
-* ESP32 S3 MCU
+* ESP32S3H4R2 MCU
   - 56-pin QFN package
   - Dual-core Extensa LX7 CPUs 
   - 512kB SRAM
   - USB, I2C, SPI, ADC, GPIO, WiFi, etc on-chip
+  - 4MB flash in package
+  - 2MB PSRAM in package
 * USB-C connector, full-speed host/device
 * Nuvoton NAU88C22 stereo codec
 * Misc GPIO
@@ -36,7 +38,11 @@ Firmware is available in the [Firmware](./Firmware) directory.
 
 ## Results
 
-The hardware implementation is very similar to an earlier project I did [S3GTA](https://github.com/emeb/S3GTA) so there weren't any big surprises in the overall performance. The CV conversions with the on-chip ADC work fine with a bit of filtering and the encoder/button/LCD-based UI is virtually identical to that on the other three dspod projects so it feels pretty much the same regardless of which instance is in use. The basic effects - filters, delays, reverbs, pitch, frequency and phase shifts - all work the same way and use roughly the right amount of CPU based on their complexity. There are a few aspects of this MCU I'd like to explore further though:
+The hardware implementation is very similar to an earlier project I did [S3GTA](https://github.com/emeb/S3GTA) so there weren't any big surprises in the overall performance. The CV conversions with the on-chip ADC work fine with a bit of filtering and the encoder/button/LCD-based UI is virtually identical to that on the other three dspod projects so it feels pretty much the same regardless of which instance is in use. The basic effects - filters, delays, reverbs, pitch, frequency and phase shifts - all work the same way and use roughly the right amount of CPU based on their complexity. The 2MB PSRAM works well for audio delay buffering without incurring too much processing delay. The current effects application code does make use of both CPU cores, running the UI and ADC code on the first core and the audio DSP on the second core - this hasn't made much difference in overall performance as the current audio code is not particularly taxing, but may help in future experiments that push the boundaries.
+
+## TBD
+
+While I've explored most of the highlights, there are a few aspects of this MCU I'd like to explore further:
 
 #### RF
 
