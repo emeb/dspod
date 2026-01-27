@@ -1,6 +1,6 @@
 # dspod_h7r3
 
-![dspod_cv1800b daughterboard](./doc/dspod_h7r3.png)
+![dspod_h7r3 daughterboard](./doc/dspod_h7r3.png)
 
 The dspod_h7r3 is a daughterboard comprising an STM32H7R3V8 MCU with a choice of PSRAM or Flash, USB and GPIO + audio I/O.
 
