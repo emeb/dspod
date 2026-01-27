@@ -1,0 +1,279 @@
+/*
+ * fx_cdl.c -  Clean Delay effect for dspod_h7r3
+ * 11-16-25 E. Brombaugh
+ */
+ 
+#include "fx_cdl.h"
+
+/* uncomment to use memmapped PSRAM */
+#define USE_MMPSR
+
+#define XFADE_BITS 11
+
+typedef struct 
+{
+	uint8_t type;			/* algo type */
+	uint8_t rng;			/* short/med/long range */
+	uint16_t rng_raw;		/* raw range from ADC param */
+	int16_t *dlybuf;		/* external delay buffer address */
+	uint32_t len;			/* buffer length */
+	uint8_t init;			/* initial pass flag for cleanout */
+	uint32_t wptr;			/* write pointer */
+	uint32_t roff1, roff2;	/* read offsets - main and xfade */
+	uint16_t xflen, xfcnt;	/* Cross-fade length and counter */
+	int16_t dly;			/* delay value w/ hysteresis */
+	int32_t dcb[2];			/* dc block on feedback */
+	int16_t fb[2];
+} fx_cdl_blk;
+
+const char *cd_param_names[] =
+{
+	"DlyAmt",
+	"Feedbk",
+	"Range ",
+};
+
+const char *cd_ranges[] =
+{
+	"Short",
+	"Medium",
+	"Long",
+};
+
+uint32_t cdl_cnt;
+
+/*
+ * Clean Delay common init
+ */
+void * fx_cd_common_Init(uint32_t *mem, uint8_t type)
+{
+	/* set up instance in mem area provided */
+	fx_cdl_blk *blk = (fx_cdl_blk *)mem;
+	mem += sizeof(fx_cdl_blk)/sizeof(uint32_t);
+
+	/* set type / range */
+	blk->type = type>>2;
+	blk->rng = (type&0x3)*2;
+	blk->rng_raw = 0;
+	
+	/* init delay buffering */
+#ifdef USE_MMPSR
+	blk->dlybuf = fx_ext_buffer;	// mem mapped PSRAM
+	blk->len = fx_ext_sz / (2*sizeof(int16_t));	// length in samples
+#else
+	blk->dlybuf = (int16_t *)mem;	// internal SRAM after this effect block
+	blk->len = (fx_int_sz - sizeof(fx_cdl_blk)/sizeof(uint32_t)) * sizeof(uint32_t) / (2*sizeof(int16_t));	// length in samples
+#endif
+	blk->init = 1;
+	blk->wptr = 0;
+	blk->roff1 = 1;
+	blk->roff2 = 0;
+	blk->xfcnt = 0;
+	blk->xflen = 1<<XFADE_BITS;
+	blk->dly = 0;
+	blk->dcb[0] = blk->dcb[1] = 0;
+	blk->fb[0] = blk->fb[1] = 0;
+	
+	printf("fx_cd_common_Init -------\n\r");
+	printf("\tfx_int_sz = %d\n\r", fx_int_sz);
+	printf("\ttype = %d, rng = %d, dlybuf = 0x%08X, len = 0x%08X\n\r",
+		blk->type, blk->rng, (unsigned int)blk->dlybuf, (unsigned int)blk->len);
+
+	cdl_cnt = 0;
+	
+	/* return pointer */
+	return (void *)blk;
+}
+
+/*
+ * Clean Delay Range init
+ */
+void * fx_cdr_Init(uint32_t *mem)
+{
+	return fx_cd_common_Init(mem, 4);
+}
+
+/*
+ * Clean Delay audio process
+ */
+void IRAM_ATTR fx_cd_common_Proc(void *vblk, int16_t *dst, int16_t *src, uint16_t sz)
+{
+	fx_cdl_blk *blk = vblk;
+	uint16_t i;
+	int16_t fb_lvl;
+	int32_t rptr;
+	int32_t mix;
+	int16_t out;
+	uint8_t chl;
+	
+	cdl_cnt++;
+	
+	/* update delay parameters if not already crossfading */
+	if(!blk->xfcnt)
+	{
+		uint8_t rng_upd = 0;
+		
+		/* set range realtime if type == 1 */
+		if(blk->type)
+		{
+			rng_upd = dsp_ratio_hyst_arb(&blk->rng_raw, ADC_val[2], 2);
+			blk->rng = 2*blk->rng_raw;
+		}
+		
+		/* get raw delay value and apply hysteresis */
+		if(dsp_gethyst(&blk->dly, ADC_val[0]) || rng_upd)
+		{
+			/* compute next delay and start crossfade */
+			blk->roff2 = (blk->dly<<blk->rng) + 1;
+			blk->roff2 = blk->roff2 > blk->len-2 ? blk->len-2 : blk->roff2;
+			blk->xfcnt = blk->xflen;
+		}
+	}
+	
+	/* get the feedback value */
+	fb_lvl = ADC_val[1];
+	
+	/* loop over the buffers */
+	for(i=0;i<sz;i++)
+	{
+		for(chl=0;chl<2;chl++)
+		{
+			/* mix feedback into write buffer */
+			mix = (*(src++)<<12) + blk->fb[chl] * fb_lvl;
+			blk->dlybuf[2*blk->wptr+chl] = dsp_ssat16(mix>>12);
+			
+			/* get main tap */
+			rptr = blk->wptr-blk->roff1;
+			rptr = rptr < 0 ? blk->len + rptr : rptr;
+			rptr = rptr >= blk->len ? rptr - blk->len : rptr;
+			if(!blk->init || (rptr < blk->wptr))
+				out = blk->dlybuf[2*rptr+chl];
+			else
+				out = 0;
+			
+			/* process crossfade */
+			if(blk->xfcnt)
+			{
+				/* do crossfade mix */
+				rptr = blk->wptr-blk->roff2;
+				rptr = rptr < 0 ? blk->len + rptr : rptr;
+				rptr = rptr >= blk->len ? rptr - blk->len : rptr;
+				mix  = (int32_t)out * blk->xfcnt;
+				if(!blk->init || (rptr < blk->wptr))
+					mix += blk->dlybuf[2*rptr+chl] * (blk->xflen - blk->xfcnt);
+				out = dsp_ssat16(mix>>XFADE_BITS);
+				
+				/* update crossfade */
+				blk->xfcnt--;
+				if(blk->xfcnt == 0)
+				{
+					/* update current delay */
+					blk->roff1 = blk->roff2;
+				}
+			}
+			
+			/* dc block on feedback */
+			mix = (int32_t)out - (blk->dcb[chl]>>8); 
+			blk->dcb[chl] += mix;
+			blk->fb[chl] = dsp_ssat16(mix);
+			
+			/* output */
+			*dst++ = out;
+		}
+	
+		/* update write pointer */
+		rptr = blk->wptr;
+		blk->wptr = (blk->wptr + 1) % blk->len;
+		
+		/* clear init flag if write ptr wrapped */
+		if(rptr > blk->wptr)
+			blk->init = 0;
+	}
+}
+
+/*
+ * Render parameter for clean delay - either delay in ms or feedback %
+ */
+void fx_cdl_Render_Parm(void *vblk, uint8_t idx, GFX_RECT *rect, uint8_t init)
+{
+	fx_cdl_blk *blk = vblk;
+	char txtbuf[32];
+	uint32_t ms;
+	static uint32_t prev_ms = 0;
+	uint8_t update = 0;
+	static int16_t prev_fb = -1;
+	int16_t fb;
+	static uint8_t prev_rng = 255;
+	
+	if(init)
+	{
+		/* clear param region and update param name */
+		gfx_clrrect(rect);
+		gfx_drawstrctr((rect->x0+rect->x1)/2, rect->y1-16, fx_get_parm_name(idx));
+		prev_ms = 0;
+		prev_fb = -1;
+		prev_rng = 255;
+	}
+	else
+	{
+		/* update param value */
+		switch(idx)
+		{
+			case 0:	// Delay
+				ms = (blk->dly<<blk->rng) + 1;
+				ms = ms > blk->len-2 ? blk->len-2 : ms;
+				ms = ms / (SAMPLE_RATE/1000);
+				if(ms != prev_ms)
+				{
+					sprintf(txtbuf, "%6u ms ", (unsigned int)ms);
+					prev_ms = ms;
+					update = 1;
+				}
+				break;
+			
+			case 1:	// Feedback
+				fb = ADC_val[idx]/41;
+				if(fb != prev_fb)
+				{
+					sprintf(txtbuf, "%2d%% ", fb);
+					prev_fb = fb;
+					update = 1;
+				}
+				break;
+			
+			case 2: // Range
+				if(blk->rng_raw != prev_rng)
+				{
+					sprintf(txtbuf, " %s ", cd_ranges[blk->rng_raw]);
+					prev_rng = blk->rng_raw;
+					update = 1;
+				}
+				//fx_cdl_Render_Parm(vblk, 1, rect);	// update Delay too
+				break;
+			
+			default:
+				return;
+		}
+		
+		if(update)
+		{
+			gfx_drawstrctr((rect->x0+rect->x1)/2, rect->y1-6, txtbuf);
+		}
+	}
+}
+
+/*
+ * clean delay range struct
+ */
+fx_struct fx_cdr_struct =
+{
+	"ClnDly",
+	3,
+	cd_param_names,
+	FX_OVL_IDX_DLY,
+	fx_cdr_Init,
+	fx_bypass_Cleanup,
+	fx_cd_common_Proc,
+	fx_cdl_Render_Parm,
+};
+
