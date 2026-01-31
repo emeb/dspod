@@ -2,7 +2,9 @@
 
 ![dspod_esp32s3 daughterboard](./doc/dspod_esp32s3.png)
 
-![](./doc/dspod_esp32s3.jpg)The dspod_esp32s3 is a daughterboard comprising an ESP32 S3 MCU with 4MB Flash, 2MB PSRAM, USB and GPIO + audio I/O.
+![](./doc/dspod_esp32s3.jpg)
+
+The dspod_esp32s3 is a daughterboard comprising an ESP32 S3 MCU with 4MB Flash, 2MB PSRAM, USB and GPIO + audio I/O.
 
 ## Abstract
 
