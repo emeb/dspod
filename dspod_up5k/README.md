@@ -40,7 +40,7 @@ This board is test to explore feasibility of audio DSP in an FPGA context. I've 
 
 ## Design Materials
 
-* [Schematic](./doc/dspod_u3c5_sch.pdf)
+* [Schematic](./doc/dspod_up5k_sch.pdf)
 
 ## Hardware
 
