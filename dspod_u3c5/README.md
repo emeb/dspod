@@ -1,4 +1,4 @@
-# dspod_h7r3
+# dspod_u3c5
 
 ![dspod_h7r3 daughterboard](./doc/dspod_u3c5_render.jpeg)
 
