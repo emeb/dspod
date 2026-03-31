@@ -1,6 +1,6 @@
 # dspod_u3c5
 
-![dspod_h7r3 daughterboard](./doc/dspod_u3c5_render.jpeg)
+![dspod_u3c5 daughterboard](./doc/dspod_u3c5.png)
 
 The dspod_u3c5 is a daughterboard comprising an STM32U3C5RI MCU with PSRAM, USB and GPIO + audio I/O.
 

@@ -1,6 +1,6 @@
 # dspod_up5k
 
-![dspod_h7r3 daughterboard](./doc/dspod_up5k.png)
+![dspod_up5k daughterboard](./doc/dspod_up5k.png)
 
 The dspod_up5k is a daughterboard comprising an iCE40UP5k FPGA with Flash, PSRAM, USB and GPIO, analog + audio I/O.
 
