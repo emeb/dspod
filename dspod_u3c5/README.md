@@ -15,7 +15,7 @@ This board is a small 32-pin device with the following features:
   - 640kB SRAM
   - 2MB Flash
   - USB, I2C, SPI, ADC, GPIO, etc on-chip
-* USB-C connector, high-speed or full-speed host/device and power
+* USB-C connector, full-speed device and power
 * SOIC-8 PSRAM 
 * Nuvoton NAU88C22 stereo codec
 * Activity LED
