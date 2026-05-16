@@ -47,7 +47,7 @@ The hardware design is provided in Kicad 9.x format in the [Hardware](./Hardware
 
 ## Firmware
 
-Firmware projects for testing the various subsystem drivers will be provided in the [Firmware](./Firmware) direcory.
+Firmware projects for testing the various subsystem drivers are provided in the [Firmware](./Firmware) direcory.
 
 ## Results
 
@@ -109,7 +109,7 @@ The U3C5 provides an SAI (serial audio interface) peripheral that supports full-
 
 ##### OctoSPI for PSRAM
 
-An AP6404 8MB QSPI PSRAM is connected to the OctoSPI port on the U3C5. The port provides both indirect access (via software-controlled SPI transactions) and memory-mapped access which allows the full 8MB to appear as though it is directly accessible within the CPU's address space. Both access methods have been tested but only indirect mode appears to be reliable - memory mapped mode exhibits errors under some access patterns and needs further debugging.
+An APS6404L 8MB QSPI PSRAM is connected to the OctoSPI port on the U3C5. The port provides both indirect access (via software-controlled SPI transactions) and memory-mapped access which allows the full 8MB to appear as though it is directly accessible within the CPU's address space. Both access methods have been tested but only indirect mode appears to be reliable - memory mapped mode exhibits errors under some access patterns and needs further debugging.
 
 ##### Encoder
 
@@ -117,7 +117,11 @@ A rotary encoder with push action provides UI navigation and is sampled at 1kHz 
 
 ##### SPI for ST7789 LCD
 
-The ST7789 320x170 IPS LCD on the dspod module is driven by one of the SPI ports on the U3C5. Driver code and graphics routines for primitive drawing and UI widgets were ported from the earlier STM32H7R3 dspod project and work without major issues. One quirk that has been observed is that the SPI port seems to "go to sleep" if not accessed every 30ms and needs to be woken up by a dummy transaction to avoid malformed drawing operations on the LCD if more than 30ms has elapsed since the previous operation. This behavior has not been seen on other STM32 parts.
+The ST7789 320x170 IPS LCD on the dspod module is driven by one of the SPI ports on the U3C5. Driver code and graphics routines for primitive drawing and UI widgets were ported from the earlier STM32H7R3 dspod project and work without major issues. One quirk that has been observed is that under some situations the SPI port seems to "go to sleep" if not accessed every 30ms and needs to be woken up by a dummy transaction to avoid malformed drawing operations on the LCD if more than 30ms has elapsed since the previous operation. This behavior has not been seen on other STM32 parts.
+
+##### PDM Microphone
+
+A 4-pin 1.27mm header is provided that carries the power, clock & data signals required to interface an external PDM microphone to the on-chip Audio Digital Filter (ADF) peripheral. With this arrangement it is possible to get high dynamic range and wide bandwidth PCM audio. Although not a core function of the dspod boards, it is interesting to experiment with these devices.
 
 ##### USB Full Speed Device
 
