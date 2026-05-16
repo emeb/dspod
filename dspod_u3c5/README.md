@@ -119,6 +119,12 @@ A rotary encoder with push action provides UI navigation and is sampled at 1kHz 
 
 The ST7789 320x170 IPS LCD on the dspod module is driven by one of the SPI ports on the U3C5. Driver code and graphics routines for primitive drawing and UI widgets were ported from the earlier STM32H7R3 dspod project and work without major issues. One quirk that has been observed is that under some situations the SPI port seems to "go to sleep" if not accessed every 30ms and needs to be woken up by a dummy transaction to avoid malformed drawing operations on the LCD if more than 30ms has elapsed since the previous operation. This behavior has not been seen on other STM32 parts.
 
+##### HSP for audio signal processing
+
+I've used the HSP for a basic phase-vocoder spectral freeze algorithm that uses 512-pt real FFTs to extract 256 frequency bins for each of the stereo channels. This operation involves windowing, Fourier transforms, rectangular/polar coordinate transforms and basic vector copy, add & subtract operations. The HSP operations are highly efficient but due to the 16kB limit on working memory it's necessary to copy the required algorithm state in & out of the HSP which uses up valuable processing time. Overall the stereo freeze algorithm uses up about 700us of the total 1333us available for the I2S audio buffer processing which does leave some slack time for additional algorithm complexity and foreground processing. 
+
+Simpler DSP such as filters, distortion, etc, would likely run faster and require less state and may enable some interesting effects in other domains. 
+
 ##### PDM Microphone
 
 A 4-pin 1.27mm header is provided that carries the power, clock & data signals required to interface an external PDM microphone to the on-chip Audio Digital Filter (ADF) peripheral. With this arrangement it is possible to get high dynamic range and wide bandwidth PCM audio. Although not a core function of the dspod boards, it is interesting to experiment with these devices.
