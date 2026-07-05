@@ -22,13 +22,13 @@ This board is a small 32-pin device with the following features:
 * Flexible clock generator for audio sampling
 * RGB Activity LED
 * 3.3V level serial for debug / status
-* SWD for flashing / debug
-* 2-chl PDM mic input
+* Custom cabling for flashing & debug - includes SPI signals for loading both FPGA and SPI flash as well as serial TX & RX for runtime debug.
 * Flexible clock generator for performance testing and accurate audio sampling
 * IO routed to 0.1inch headers:
   - SPI
   - I2C
-  - GPIO
+  - Button & Encoder input
+  - Trigger / Gate in / out.
   - Analog
   - Audio
   - Power
