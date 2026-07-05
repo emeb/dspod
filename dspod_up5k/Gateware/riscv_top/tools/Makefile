@@ -1,0 +1,32 @@
+# Makefile for riscv_lcd raw image flashing
+# Modified from examples in icestorm distribution
+# 10-15-22 E. Brombaugh
+
+#IMG = dspod_up5k_front
+IMG = stars
+
+# tools
+IMGCVT = png2rgb565.sh
+FFMPEG = ffmpeg
+DD = dd
+CDCPROG = cdc_prog
+DFU_UTIL = dfu-util
+
+all: $(IMG).565
+
+%.565: %.png
+	$(FFMPEG) -vcodec png -i $< -vcodec rawvideo -f rawvideo -pix_fmt rgb565 temp.565
+	$(DD) conv=swab < temp.565 > $@
+	rm temp.565
+
+flash: $(IMG).565
+	$(CDCPROG) -w -a 0xa0000 -p /dev/ttyACM0 $<
+	
+dfu: $(IMG).565
+	sudo $(DFU_UTIL) -d1d50:6146 -a1 -D $<
+
+clean:
+	rm -f *.565
+
+.SECONDARY:
+.PHONY: all prog clean

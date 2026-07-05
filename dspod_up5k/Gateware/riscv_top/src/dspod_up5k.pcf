@@ -1,0 +1,71 @@
+#########################
+# dspod_up5k pinout
+# 06-04-2026 E. Brombaugh
+#########################
+
+# Boot Button
+set_io BTN 2
+
+# Parallel/Serial In
+set_io SER_DAT 3
+set_io SER_CLK 4
+set_io SER_SHF 6
+
+# ADC
+set_io ADC_DIN 9
+set_io ADC_DOUT 10
+set_io ADC_CLK 11
+set_io ADC_CS 12
+
+# SPI Memory interface
+set_io MEM_SPI_PSRAM_CS 13
+set_io MEM_SPI_MOSI_IO0 14
+set_io MEM_SPI_SCLK 15
+set_io MEM_SPI_FLASH_CS 16
+set_io MEM_SPI_MISO_IO1 17
+set_io MEM_SPI_WP_IO2 18
+set_io MEM_SPI_HLD_IO3 19
+
+# Si5351 Clock Osc
+set_io AUDIOCLK 20
+
+# Gate Output
+set_io GATE_OUT 21
+
+# I2S
+set_io I2S_MCLK 23
+set_io I2S_DO 25
+set_io I2S_DI 26
+set_io I2S_SCLK 27
+set_io I2S_LRCK 28
+
+# ACIA Serial
+set_io TX 31
+set_io RX 32
+
+# I2C 
+set_io SCL 34
+set_io SDA 36
+
+# 12MHz Clock Oscillator
+set_io CLK12MHZ 35
+
+# USB
+set_io USB_PU 37
+set_io USB_DM 38
+set_io USB_DP 42
+
+# RGB LED
+set_io RGB2 39
+set_io RGB1 40
+set_io RGB0 41
+
+# LCD
+set_io LCD_BK 43
+set_io LCD_NRST 44
+set_io LCD_DC 45
+set_io LCD_CS 46
+set_io LCD_SCK 47
+set_io LCD_SDO 48
+
+

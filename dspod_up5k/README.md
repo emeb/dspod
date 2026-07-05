@@ -52,4 +52,22 @@ Firmware projects for testing the various subsystem drivers will be provided in 
 
 ## Results
 
-PCBs and BOM are in-house now but haven't been assembled yet. Watch this space!
+![](doc/dspod_up5k_front.jpg)
+
+The board has been built and tested. All the interfaces work:
+
+- USB Fullspeed works via the NO2 Bootloader.
+
+- ST7789 SPI LCD works.
+
+- Parallel to serial input expander for the button and rotary encoder works, but does not have input pullup resistors so these had to be bodged on externally.
+
+- NAU88C22 audio codec I2S and I2C interfaces work. Audio is clean various extra features of the codec accessible via I2C are functional.
+
+- 12-bit 4-chl SPI ADC works and has resonable noise performance with no additional processing required (oversampling, averaging, crosstalk correction, etc).
+
+- SPI configuration flash and auxilliary PSRAM work.
+
+- SI5351 I2C-controlled audio clock generator works.
+
+Several gateware examples are provided, including an audio effects processor based on the venerable Alesis MIDIVerb.

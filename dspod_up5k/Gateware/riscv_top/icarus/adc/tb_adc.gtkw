@@ -1,0 +1,69 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Sun Jun  7 21:02:09 2026
+[*]
+[dumpfile] "/home/ericb/Engineering/KBADC/lattice/dspod_up5k/riscv_top/icarus/adc/tb_adc.vcd"
+[dumpfile_mtime] "Sun Jun  7 20:59:39 2026"
+[dumpfile_size] 2166825
+[savefile] "/home/ericb/Engineering/KBADC/lattice/dspod_up5k/riscv_top/icarus/adc/tb_adc.gtkw"
+[timestart] 9650000
+[size] 1365 885
+[pos] -1 -1
+*-23.000000 1953000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_adc.
+[sst_width] 263
+[signals_width] 150
+[sst_expanded] 1
+[sst_vpaned_height] 256
+@200
+-TB
+@28
+tb_adc.ADC_CLK
+tb_adc.ADC_CS
+tb_adc.ADC_DIN
+tb_adc.ADC_DOUT
+tb_adc.a0_v
+tb_adc.a1_v
+tb_adc.a2_v
+tb_adc.a3_v
+@22
+tb_adc.adc_data[11:0]
+@201
+-UUT
+@28
+tb_adc.uut.a0_v
+tb_adc.uut.a1_v
+tb_adc.uut.a2_v
+tb_adc.uut.a3_v
+tb_adc.uut.adc_chl[1:0]
+tb_adc.uut.adc_clk
+tb_adc.uut.adc_clko
+@22
+tb_adc.uut.adc_cnt[3:0]
+@28
+tb_adc.uut.adc_cs
+@22
+tb_adc.uut.adc_data[11:0]
+@28
+tb_adc.uut.adc_pchl[1:0]
+tb_adc.uut.adc_si
+tb_adc.uut.adc_so
+tb_adc.uut.clk
+tb_adc.uut.clk_div[1:0]
+tb_adc.uut.clk_ena
+tb_adc.uut.clk_ena_180
+@22
+tb_adc.uut.corrected[11:0]
+@28
+tb_adc.uut.corrected_valid
+tb_adc.uut.data_chl[1:0]
+@22
+tb_adc.uut.data_curr[11:0]
+tb_adc.uut.data_prev[11:0]
+@28
+tb_adc.uut.data_valid
+tb_adc.uut.reset
+@22
+tb_adc.uut.sreg[11:0]
+[pattern_trace] 1
+[pattern_trace] 0

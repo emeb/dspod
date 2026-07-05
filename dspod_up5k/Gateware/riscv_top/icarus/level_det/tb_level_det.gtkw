@@ -1,0 +1,66 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Thu Jul  2 03:57:32 2026
+[*]
+[dumpfile] "/home/ericb/Engineering/KBADC/lattice/dspod_up5k/riscv_top/icarus/level_det/tb_level_det.vcd"
+[dumpfile_mtime] "Thu Jul  2 03:42:13 2026"
+[dumpfile_size] 1096181
+[savefile] "/home/ericb/Engineering/KBADC/lattice/dspod_up5k/riscv_top/icarus/level_det/tb_level_det.gtkw"
+[timestart] 144963000
+[size] 1488 750
+[pos] -1 -1
+*-18.000000 139902000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_level_det.
+[sst_width] 263
+[signals_width] 166
+[sst_expanded] 1
+[sst_vpaned_height] 210
+@28
+tb_level_det.clk
+tb_level_det.reset
+@22
+tb_level_det.enacnt[5:0]
+@28
+tb_level_det.i2s_load
+@22
+tb_level_det.left_rx[15:0]
+tb_level_det.right_rx[15:0]
+tb_level_det.left_tx[15:0]
+tb_level_det.right_tx[15:0]
+@28
+tb_level_det.lvl_addr[1:0]
+@22
+tb_level_det.lvl_do[15:0]
+@28
+tb_level_det.lvl_ena
+@200
+-UUT
+@28
+tb_level_det.uut.clk
+tb_level_det.uut.reset
+tb_level_det.uut.ena
+@22
+tb_level_det.uut.ena_pipe[6:0]
+tb_level_det.uut.left_rx[15:0]
+tb_level_det.uut.right_rx[15:0]
+tb_level_det.uut.left_tx[15:0]
+tb_level_det.uut.right_tx[15:0]
+tb_level_det.uut.mux[15:0]
+tb_level_det.uut.lvl_data[15:0]
+tb_level_det.uut.lvl_hld_mux[15:0]
+@23
+tb_level_det.uut.lvl_peak[15:0]
+@22
+tb_level_det.uut.lvl_lr[15:0]
+tb_level_det.uut.lvl_rr[15:0]
+tb_level_det.uut.lvl_lt[15:0]
+tb_level_det.uut.lvl_rt[15:0]
+@28
+tb_level_det.uut.lvl_ena
+tb_level_det.uut.lvl_addr[1:0]
+tb_level_det.uut.lvl_clr_addr[1:0]
+tb_level_det.uut.lvl_clr_pipe[2:0]
+@22
+tb_level_det.uut.lvl_do[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

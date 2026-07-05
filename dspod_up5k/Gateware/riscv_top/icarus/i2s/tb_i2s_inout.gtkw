@@ -1,0 +1,33 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Tue Jun  9 01:47:58 2026
+[*]
+[dumpfile] "/home/ericb/Engineering/KBADC/lattice/dspod_up5k/riscv_top/icarus/i2s/tb_i2s_inout.vcd"
+[dumpfile_mtime] "Tue Jun  9 01:44:31 2026"
+[dumpfile_size] 2260500
+[savefile] "/home/ericb/Engineering/KBADC/lattice/dspod_up5k/riscv_top/icarus/i2s/tb_i2s_inout.gtkw"
+[timestart] 199860000
+[size] 1866 948
+[pos] -1 -1
+*-22.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_i2s_inout.
+[sst_width] 373
+[signals_width] 198
+[sst_expanded] 1
+[sst_vpaned_height] 281
+@28
+tb_i2s_inout.clk
+tb_i2s_inout.reset
+tb_i2s_inout.I2S_MCLK
+tb_i2s_inout.I2S_SCLK
+tb_i2s_inout.I2S_DI
+tb_i2s_inout.I2S_DO
+tb_i2s_inout.I2S_LRCK
+tb_i2s_inout.i2s_load
+@23
+tb_i2s_inout.left_rx[15:0]
+tb_i2s_inout.left_tx[15:0]
+tb_i2s_inout.right_rx[15:0]
+tb_i2s_inout.right_tx[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

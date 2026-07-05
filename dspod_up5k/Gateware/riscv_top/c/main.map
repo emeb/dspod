@@ -1,0 +1,140 @@
+Archive member included to satisfy reference by file (symbol)
+
+/opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+                              /tmp/ccRQ3sMd.ltrans0.ltrans.o (__mulsi3)
+/opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+                              /tmp/ccRQ3sMd.ltrans0.ltrans.o (__udivsi3)
+
+Allocating common symbols
+Common symbol       size              file
+
+si5351_databuffer   0x8               /tmp/ccIYBN09.o (symbol from plugin)
+rotation            0x1               /tmp/ccbMsTdm.o (symbol from plugin)
+si5351_vco_freq     0x8               /tmp/ccIYBN09.o (symbol from plugin)
+_width              0x2               /tmp/ccbMsTdm.o (symbol from plugin)
+st7789_spi          0x4               /tmp/ccbMsTdm.o (symbol from plugin)
+colstart            0x2               /tmp/ccbMsTdm.o (symbol from plugin)
+_height             0x2               /tmp/ccbMsTdm.o (symbol from plugin)
+rowstart            0x2               /tmp/ccbMsTdm.o (symbol from plugin)
+
+Discarded input sections
+
+ .debug_line    0x0000000000000000       0x96 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .debug_info    0x0000000000000000       0x26 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .debug_abbrev  0x0000000000000000       0x14 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .debug_aranges
+                0x0000000000000000       0x20 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .debug_str     0x0000000000000000       0xdc /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .debug_line    0x0000000000000000      0x16c /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+ .debug_info    0x0000000000000000       0x26 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+ .debug_abbrev  0x0000000000000000       0x14 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+ .debug_aranges
+                0x0000000000000000       0x20 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+ .debug_str     0x0000000000000000       0xd9 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+ROM              0x0000000000000000 0x0000000000002000 xr
+RAM1             0x0000000010000000 0x0000000000008000 xrw
+RAM2             0x0000000010008000 0x0000000000008000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000000000000      0xa9c
+                0x0000000000000000                . = ALIGN (0x4)
+ *(.text)
+ .text          0x0000000000000000       0xd0 /tmp/cclPfR4T.o
+ .text          0x00000000000000d0      0x514 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ .text          0x00000000000005e4       0x24 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+                0x00000000000005e4                __mulsi3
+ .text          0x0000000000000608       0xb4 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+                0x0000000000000608                __divsi3
+                0x0000000000000610                __udivsi3
+                0x0000000000000658                __umodsi3
+                0x000000000000068c                __modsi3
+ *(.text*)
+ .text.startup  0x00000000000006bc      0x2c0 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+                0x00000000000006bc                main
+ *(.rodata)
+ *(.rodata*)
+ .rodata.str1.4
+                0x000000000000097c      0x11c /tmp/ccRQ3sMd.ltrans0.ltrans.o
+                                        0x11d (size before relaxing)
+ *(.srodata)
+ .srodata       0x0000000000000a98        0x4 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ *(.srodata*)
+                0x0000000000000a9c                . = ALIGN (0x4)
+                0x0000000000000a9c                _etext = .
+                0x0000000000000a9c                _sidata = _etext
+
+.rela.dyn       0x0000000000000a9c        0x0
+ .rela.text     0x0000000000000a9c        0x0 /tmp/cclPfR4T.o
+
+.data           0x0000000010008000        0x0 load address 0x0000000000000a9c
+                0x0000000010008000                . = ALIGN (0x4)
+                0x0000000010008000                _sdata = .
+                0x0000000010008000                _ram_start = .
+                0x0000000010008000                . = ALIGN (0x4)
+ *(.data)
+ .data          0x0000000010008000        0x0 /tmp/cclPfR4T.o
+ .data          0x0000000010008000        0x0 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ .data          0x0000000010008000        0x0 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .data          0x0000000010008000        0x0 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+ *(.data*)
+ *(.sdata)
+ *(.sdata*)
+                0x0000000010008000                . = ALIGN (0x4)
+                0x0000000010008000                _edata = .
+
+.bss            0x0000000010008000        0x8 load address 0x0000000000000a9c
+                0x0000000010008000                . = ALIGN (0x4)
+                0x0000000010008000                _sbss = .
+ *(.bss)
+ .bss           0x0000000010008000        0x0 /tmp/cclPfR4T.o
+ .bss           0x0000000010008000        0x0 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ .bss           0x0000000010008000        0x0 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .bss           0x0000000010008000        0x0 /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+ *(.bss*)
+ *(.sbss)
+ .sbss          0x0000000010008000        0x8 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ *(.sbss*)
+ *(COMMON)
+                0x0000000010008008                . = ALIGN (0x4)
+                0x0000000010008008                _ebss = .
+
+.heap           0x0000000010008008        0x0
+                0x0000000010008008                . = ALIGN (0x4)
+                0x0000000010008008                _heap_start = .
+
+.ram1_data      0x0000000010000000     0x8000
+                0x0000000010000000                . = ALIGN (0x4)
+ *(.ram1_data)
+ .ram1_data     0x0000000010000000     0x8000 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ *(.ram1_data*)
+LOAD /tmp/cclPfR4T.o
+LOAD /tmp/ccRQ3sMd.ltrans0.ltrans.o
+LOAD /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a
+START GROUP
+LOAD /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/../../../../riscv64-unknown-elf/lib/rv32i/ilp32/libc.a
+LOAD /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/../../../../riscv64-unknown-elf/lib/rv32i/ilp32/libgloss.a
+END GROUP
+LOAD /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a
+OUTPUT(main.elf elf32-littleriscv)
+
+.riscv.attributes
+                0x0000000000000000       0x1c
+ .riscv.attributes
+                0x0000000000000000       0x1a /tmp/cclPfR4T.o
+ .riscv.attributes
+                0x000000000000001a       0x1c /tmp/ccRQ3sMd.ltrans0.ltrans.o
+ .riscv.attributes
+                0x0000000000000036       0x1a /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(muldi3.o)
+ .riscv.attributes
+                0x0000000000000050       0x1a /opt/riscv-gcc/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/bin/../lib/gcc/riscv64-unknown-elf/8.3.0/rv32i/ilp32/libgcc.a(div.o)
+
+.comment        0x0000000000000000       0x28
+ .comment       0x0000000000000000       0x28 /tmp/ccRQ3sMd.ltrans0.ltrans.o
+                                         0x29 (size before relaxing)
