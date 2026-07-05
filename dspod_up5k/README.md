@@ -46,9 +46,9 @@ This board is test to explore feasibility of audio DSP in an FPGA context. I've 
 
 The hardware design is provided in Kicad 9.x format in the [Hardware](./Hardware) directory.
 
-## Firmware
+## Gateware
 
-Firmware projects for testing the various subsystem drivers will be provided in the [Firmware](./Firmware) direcory.
+FPGA gateware projects are provided in the [Gateware](./Gateware) directory.
 
 ## Results
 
