@@ -15,3 +15,4 @@ The collection consists of the following hardware
 * [dspod_h7r3](./dspod_h7r3) - a daughterboard with an STM32H7R3V8 MCU, QSPI flash or PSRAM, USB, GPIO and audio I/O
 * [dspod_u3c5](dspod_u3c5) - a daughterboard with an STM32U3C5RI MCU, QSPI PSRAM, USB, GPIO and audio I/O.
 * [dspod_up5k](dspod_up5k) - a daughterboard with an iCE40UP5k FPGA, Flash, PSRAM, ADC, GPIO and audio I/O.
+* [dspod_stampp4](./dspod_stampp4) - a daughterboard with an ESP32 P4 MCU, 16MB flash, 32MB PSRAM, USB, GPIO and Audio I/O
