@@ -2,7 +2,7 @@
 
 ![dspod_esp32s3 daughterboard](./doc/stampp4_front.jpg)
 
-The dspod_stampp4 is an audio daughterboard based on the M5Stack Stamp P4 which provides n ESP32 P4 MCU with 4MB Flash, 32MB PSRAM, USB and GPIO. The M5Stack module is used because the bare ESP32P4 devices were not available from the usual hobbyist distribution channels at the time of development. The primary motivation was to see if the faster dual-core RISC V architecture provided any meaningful performance benefit.
+The dspod_stampp4 is an audio daughterboard based on the M5Stack Stamp P4 which provides an ESP32P4 MCU with 16MB Flash, 32MB PSRAM, USB and GPIO. The M5Stack module is used because the bare ESP32P4 devices were not available from the usual hobbyist distribution channels at the time of development. The primary motivation was to see if the faster dual-core RISC V architecture provided any meaningful performance benefit.
 
 ## Abstract
 
